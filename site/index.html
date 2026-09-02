@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="preload">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -194,7 +194,11 @@ body::before {
 }
 
 @keyframes rise { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
-.rise { animation:rise .8s cubic-bezier(.2,.7,.3,1) both; animation-delay:var(--d,0s); }
+/* Scoped to .preload, which the script at the end of the body removes once the
+   reveal has played. Without that, any later reflow (a full-page screenshot, a
+   social preview render, print) restarts the animation and catches the hero at
+   opacity 0 — a blank page above the fold. */
+.preload .rise { animation:rise .8s cubic-bezier(.2,.7,.3,1) both; animation-delay:var(--d,0s); }
 
 header { padding:34px 0 0; }
 nav { display:flex; align-items:center; gap:12px; }
@@ -209,8 +213,11 @@ nav .spacer { flex:1; }
 .hero-grid { display:grid; grid-template-columns:1fr auto; gap:56px; align-items:center; }
 h1 {
   font-family:var(--display); font-weight:600;
-  font-size:clamp(40px,6.4vw,70px); line-height:1.03; letter-spacing:-.032em;
-  margin:0 0 22px; max-width:13ch;
+  font-size:clamp(34px,6.2vw,70px); line-height:1.05; letter-spacing:-.032em;
+  margin:0 0 22px;
+  /* The line break is set explicitly by the <br>; a max-width here would
+     re-wrap “Assigns the work.” and strand the last word. */
+  text-wrap:balance;
 }
 h1 em { font-style:normal; color:var(--violet); }
 .lede { font-size:clamp(17px,2.1vw,20.5px); color:var(--ink-2); max-width:52ch; margin:0; font-weight:300; }
@@ -433,6 +440,14 @@ footer { border-top:1px solid var(--line); padding:40px 0 64px; }
     </p>
   </footer>
 </div>
+
+<script>
+  // Let the entrance animation play once, then take it off the elements for good.
+  // If this never runs, animation-fill-mode leaves everything visible anyway.
+  addEventListener('load', function () {
+    setTimeout(function () { document.documentElement.classList.remove('preload'); }, 1600);
+  });
+</script>
 
 </body>
 </html>
