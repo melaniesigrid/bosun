@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bosun &mdash; assigns the work, then follows up</title>
+<meta name="description" content="Bosun turns an objective into assigned tasks, then follows up with the people who owe you something. In development at Northbound Software Studio.">
+<meta property="og:title" content="Bosun - assigns the work, then follows up">
+<meta property="og:description" content="Most tools are a place to write work down. Bosun does the two things a board cannot: it decides who does what, and it follows up.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&amp;family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&amp;display=swap" rel="stylesheet">
+<style>
+:root {
+  --canvas:#ebe7e2; --surface:#eeeae6;
+  --ink:#2e2a26; --ink-2:#665f57; --ink-3:#7a7470; --line:#d9d3cc;
+  --violet:#7d4fd1; --sage:#2ECC8A; --terracotta:#d1594e; --tan:#a87c4e;
+  --out:-8px -8px 16px rgba(255,250,244,.78), 8px 8px 18px rgba(160,143,126,.31);
+  --out-sm:-5px -5px 10px rgba(255,250,244,.78), 5px 5px 12px rgba(160,143,126,.27);
+  --in:inset -4px -4px 8px rgba(255,250,244,.68), inset 4px 4px 8px rgba(160,143,126,.24);
+  --in-sm:inset -3px -3px 6px rgba(255,250,244,.68), inset 3px 3px 6px rgba(160,143,126,.24);
+  --body:'DM Sans',system-ui,sans-serif;
+  --display:'Archivo','DM Sans',system-ui,sans-serif;
+}
+*,*::before,*::after { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  margin:0; background:var(--canvas); color:var(--ink);
+  font-family:var(--body); font-size:17px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+/* Grain, so the warm canvas does not read as flat beige. */
+body::before {
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.4;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+}
+.wrap { position:relative; z-index:1; max-width:1080px; margin:0 auto; padding:0 28px; }
+
+/* --- the six dots, borrowed from the app's logo --- */
+.swarm,.mark { position:relative; flex:none; }
+.swarm { width:120px; height:120px; }
+.mark { width:26px; height:26px; }
+.swarm i,.mark i {
+  position:absolute; top:50%; left:50%; border-radius:50%; background:var(--violet);
+  animation-duration:9.6s; animation-timing-function:cubic-bezier(.34,1.2,.64,1);
+  animation-iteration-count:infinite;
+}
+.swarm i { width:19px; height:19px; margin:-9.5px 0 0 -9.5px; }
+.mark i { width:5px; height:5px; margin:-2.5px 0 0 -2.5px; }
+.swarm i:nth-child(1) { animation-name: swarm-0; animation-delay: 0.00s; }
+.swarm i:nth-child(2) { animation-name: swarm-1; animation-delay: 0.04s; }
+.swarm i:nth-child(3) { animation-name: swarm-2; animation-delay: 0.08s; }
+.swarm i:nth-child(4) { animation-name: swarm-3; animation-delay: 0.12s; }
+.swarm i:nth-child(5) { animation-name: swarm-4; animation-delay: 0.16s; }
+.swarm i:nth-child(6) { animation-name: swarm-5; animation-delay: 0.20s; }
+.mark i:nth-child(1) { animation-name: mark-0; animation-delay: 0.00s; }
+.mark i:nth-child(2) { animation-name: mark-1; animation-delay: 0.04s; }
+.mark i:nth-child(3) { animation-name: mark-2; animation-delay: 0.08s; }
+.mark i:nth-child(4) { animation-name: mark-3; animation-delay: 0.12s; }
+.mark i:nth-child(5) { animation-name: mark-4; animation-delay: 0.16s; }
+.mark i:nth-child(6) { animation-name: mark-5; animation-delay: 0.20s; }
+@keyframes swarm-0 {
+  0% { transform: translate(0.00px, -34.00px); }
+  16% { transform: translate(0.00px, -34.00px); }
+  25% { transform: translate(0.00px, -34.00px); }
+  41% { transform: translate(0.00px, -34.00px); }
+  50% { transform: translate(0.00px, -34.00px); }
+  66% { transform: translate(0.00px, -34.00px); }
+  75% { transform: translate(0.00px, -34.00px); }
+  91% { transform: translate(0.00px, -34.00px); }
+  100% { transform: translate(0.00px, -34.00px); }
+}
+@keyframes swarm-1 {
+  0% { transform: translate(-17.00px, 0.00px); }
+  16% { transform: translate(-17.00px, 0.00px); }
+  25% { transform: translate(29.44px, -17.00px); }
+  41% { transform: translate(29.44px, -17.00px); }
+  50% { transform: translate(-25.50px, -10.20px); }
+  66% { transform: translate(-25.50px, -10.20px); }
+  75% { transform: translate(0.00px, 34.00px); }
+  91% { transform: translate(0.00px, 34.00px); }
+  100% { transform: translate(-17.00px, 0.00px); }
+}
+@keyframes swarm-2 {
+  0% { transform: translate(17.00px, 0.00px); }
+  16% { transform: translate(17.00px, 0.00px); }
+  25% { transform: translate(29.44px, 17.00px); }
+  41% { transform: translate(29.44px, 17.00px); }
+  50% { transform: translate(25.50px, -10.20px); }
+  66% { transform: translate(25.50px, -10.20px); }
+  75% { transform: translate(-34.00px, 0.00px); }
+  91% { transform: translate(-34.00px, 0.00px); }
+  100% { transform: translate(17.00px, 0.00px); }
+}
+@keyframes swarm-3 {
+  0% { transform: translate(-34.00px, 34.00px); }
+  16% { transform: translate(-34.00px, 34.00px); }
+  25% { transform: translate(0.00px, 34.00px); }
+  41% { transform: translate(0.00px, 34.00px); }
+  50% { transform: translate(-25.50px, 10.20px); }
+  66% { transform: translate(-25.50px, 10.20px); }
+  75% { transform: translate(34.00px, 0.00px); }
+  91% { transform: translate(34.00px, 0.00px); }
+  100% { transform: translate(-34.00px, 34.00px); }
+}
+@keyframes swarm-4 {
+  0% { transform: translate(0.00px, 34.00px); }
+  16% { transform: translate(0.00px, 34.00px); }
+  25% { transform: translate(-29.44px, 17.00px); }
+  41% { transform: translate(-29.44px, 17.00px); }
+  50% { transform: translate(25.50px, 10.20px); }
+  66% { transform: translate(25.50px, 10.20px); }
+  75% { transform: translate(0.00px, 0.00px); }
+  91% { transform: translate(0.00px, 0.00px); }
+  100% { transform: translate(0.00px, 34.00px); }
+}
+@keyframes swarm-5 {
+  0% { transform: translate(34.00px, 34.00px); }
+  16% { transform: translate(34.00px, 34.00px); }
+  25% { transform: translate(-29.44px, -17.00px); }
+  41% { transform: translate(-29.44px, -17.00px); }
+  50% { transform: translate(0.00px, 34.00px); }
+  66% { transform: translate(0.00px, 34.00px); }
+  75% { transform: translate(0.00px, 0.00px); }
+  91% { transform: translate(0.00px, 0.00px); }
+  100% { transform: translate(34.00px, 34.00px); }
+}
+@keyframes mark-0 {
+  0% { transform: translate(0.00px, -7.00px); }
+  16% { transform: translate(0.00px, -7.00px); }
+  25% { transform: translate(0.00px, -7.00px); }
+  41% { transform: translate(0.00px, -7.00px); }
+  50% { transform: translate(0.00px, -7.00px); }
+  66% { transform: translate(0.00px, -7.00px); }
+  75% { transform: translate(0.00px, -7.00px); }
+  91% { transform: translate(0.00px, -7.00px); }
+  100% { transform: translate(0.00px, -7.00px); }
+}
+@keyframes mark-1 {
+  0% { transform: translate(-3.50px, 0.00px); }
+  16% { transform: translate(-3.50px, 0.00px); }
+  25% { transform: translate(6.06px, -3.50px); }
+  41% { transform: translate(6.06px, -3.50px); }
+  50% { transform: translate(-5.25px, -2.10px); }
+  66% { transform: translate(-5.25px, -2.10px); }
+  75% { transform: translate(0.00px, 7.00px); }
+  91% { transform: translate(0.00px, 7.00px); }
+  100% { transform: translate(-3.50px, 0.00px); }
+}
+@keyframes mark-2 {
+  0% { transform: translate(3.50px, 0.00px); }
+  16% { transform: translate(3.50px, 0.00px); }
+  25% { transform: translate(6.06px, 3.50px); }
+  41% { transform: translate(6.06px, 3.50px); }
+  50% { transform: translate(5.25px, -2.10px); }
+  66% { transform: translate(5.25px, -2.10px); }
+  75% { transform: translate(-7.00px, 0.00px); }
+  91% { transform: translate(-7.00px, 0.00px); }
+  100% { transform: translate(3.50px, 0.00px); }
+}
+@keyframes mark-3 {
+  0% { transform: translate(-7.00px, 7.00px); }
+  16% { transform: translate(-7.00px, 7.00px); }
+  25% { transform: translate(0.00px, 7.00px); }
+  41% { transform: translate(0.00px, 7.00px); }
+  50% { transform: translate(-5.25px, 2.10px); }
+  66% { transform: translate(-5.25px, 2.10px); }
+  75% { transform: translate(7.00px, 0.00px); }
+  91% { transform: translate(7.00px, 0.00px); }
+  100% { transform: translate(-7.00px, 7.00px); }
+}
+@keyframes mark-4 {
+  0% { transform: translate(0.00px, 7.00px); }
+  16% { transform: translate(0.00px, 7.00px); }
+  25% { transform: translate(-6.06px, 3.50px); }
+  41% { transform: translate(-6.06px, 3.50px); }
+  50% { transform: translate(5.25px, 2.10px); }
+  66% { transform: translate(5.25px, 2.10px); }
+  75% { transform: translate(0.00px, 0.00px); }
+  91% { transform: translate(0.00px, 0.00px); }
+  100% { transform: translate(0.00px, 7.00px); }
+}
+@keyframes mark-5 {
+  0% { transform: translate(7.00px, 7.00px); }
+  16% { transform: translate(7.00px, 7.00px); }
+  25% { transform: translate(-6.06px, -3.50px); }
+  41% { transform: translate(-6.06px, -3.50px); }
+  50% { transform: translate(0.00px, 7.00px); }
+  66% { transform: translate(0.00px, 7.00px); }
+  75% { transform: translate(0.00px, 0.00px); }
+  91% { transform: translate(0.00px, 0.00px); }
+  100% { transform: translate(7.00px, 7.00px); }
+}
+
+@keyframes rise { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+.rise { animation:rise .8s cubic-bezier(.2,.7,.3,1) both; animation-delay:var(--d,0s); }
+
+header { padding:34px 0 0; }
+nav { display:flex; align-items:center; gap:12px; }
+.wordmark { font-family:var(--display); font-weight:600; font-size:19px; letter-spacing:-.01em; }
+nav .spacer { flex:1; }
+.status {
+  font-size:11.5px; font-weight:500; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--ink-2); padding:7px 14px; border-radius:9999px; box-shadow:var(--in-sm);
+}
+
+.hero { padding:clamp(60px,11vw,124px) 0 clamp(48px,7vw,84px); }
+.hero-grid { display:grid; grid-template-columns:1fr auto; gap:56px; align-items:center; }
+h1 {
+  font-family:var(--display); font-weight:600;
+  font-size:clamp(40px,6.4vw,70px); line-height:1.03; letter-spacing:-.032em;
+  margin:0 0 22px; max-width:13ch;
+}
+h1 em { font-style:normal; color:var(--violet); }
+.lede { font-size:clamp(17px,2.1vw,20.5px); color:var(--ink-2); max-width:52ch; margin:0; font-weight:300; }
+
+.question { margin:0 0 clamp(60px,9vw,104px); padding:clamp(34px,5vw,52px); border-radius:24px; box-shadow:var(--out); background:var(--surface); }
+.kicker { font-size:11.5px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin:0 0 18px; }
+.question q {
+  font-family:var(--display); font-weight:500; quotes:none;
+  font-size:clamp(24px,3.6vw,38px); line-height:1.22; letter-spacing:-.022em; display:block;
+}
+.question q::after { content:''; display:block; width:56px; height:3px; border-radius:2px; background:var(--violet); margin-top:26px; }
+.question p { color:var(--ink-2); max-width:60ch; margin:22px 0 0; font-weight:300; }
+
+section { margin-bottom:clamp(64px,9vw,112px); }
+h2 { font-family:var(--display); font-weight:600; font-size:clamp(24px,3.2vw,32px); letter-spacing:-.024em; margin:0 0 8px; }
+.sub { color:var(--ink-2); margin:0 0 40px; max-width:56ch; font-weight:300; }
+
+.steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(228px,1fr)); gap:20px; list-style:none; padding:0; margin:0; counter-reset:s; }
+.steps li { counter-increment:s; padding:30px 26px 28px; border-radius:20px; background:var(--surface); box-shadow:var(--out-sm); }
+.steps li::before {
+  content:counter(s,decimal-leading-zero);
+  font-family:var(--display); font-size:12px; font-weight:700; letter-spacing:.08em;
+  color:var(--violet); display:block; margin-bottom:16px;
+}
+.steps h3 { font-family:var(--display); font-size:17.5px; font-weight:600; letter-spacing:-.012em; margin:0 0 9px; }
+.steps p { font-size:14.5px; color:var(--ink-2); margin:0; font-weight:300; line-height:1.55; }
+
+.feed { padding:12px; border-radius:22px; box-shadow:var(--in); }
+.feed ul { list-style:none; margin:0; padding:0; }
+.feed li { display:flex; gap:18px; align-items:flex-start; padding:17px 18px; border-radius:14px; }
+.feed li + li { border-top:1px solid var(--line); }
+.feed b { font-weight:500; font-size:15px; display:block; }
+.feed p { margin:3px 0 0; font-size:13.5px; color:var(--ink-2); font-weight:300; line-height:1.5; }
+.tag {
+  flex:none; width:116px; font-size:10.5px; font-weight:500; letter-spacing:.07em;
+  text-transform:uppercase; color:var(--ink-2); padding-top:3px;
+}
+.tag::before { content:''; display:inline-block; width:6px; height:6px; border-radius:50%; margin-right:7px; vertical-align:middle; background:var(--tan); }
+.tag--goal::before,.tag--tasks::before { background:var(--violet); }
+.tag--ping::before,.tag--clarification::before { background:var(--terracotta); }
+.tag--status::before,.tag--task::before { background:var(--sage); }
+
+.not { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:18px; }
+.not div { padding:24px; border-radius:18px; box-shadow:var(--in-sm); }
+.not b { font-family:var(--display); font-weight:600; font-size:15.5px; display:block; margin-bottom:7px; }
+.not p { margin:0; font-size:14px; color:var(--ink-2); font-weight:300; line-height:1.55; }
+
+footer { border-top:1px solid var(--line); padding:40px 0 64px; }
+.foot { display:flex; flex-wrap:wrap; gap:18px 32px; align-items:center; font-size:14px; color:var(--ink-2); }
+.foot a { color:var(--ink-2); text-decoration:none; border-bottom:1px solid var(--line); padding-bottom:1px; }
+.foot a:hover { color:var(--violet); border-color:var(--violet); }
+.note { margin:24px 0 0; font-size:13px; color:var(--ink-2); max-width:64ch; font-weight:300; line-height:1.6; }
+
+@media (max-width:760px) {
+  .hero-grid { grid-template-columns:1fr; gap:40px; }
+  .swarm { width:96px; height:96px; }
+  .feed li { flex-direction:column; gap:7px; }
+  .tag { width:auto; }
+}
+@media (prefers-reduced-motion:reduce) {
+  *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+  html { scroll-behavior:auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <nav class="rise">
+      <span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      <span class="wordmark">Bosun</span>
+      <span class="spacer"></span>
+      <span class="status">In development</span>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <div class="hero-grid">
+      <div>
+        <h1 class="rise" style="--d:.08s">Assigns the work.<br>Then <em>follows up</em>.</h1>
+        <p class="lede rise" style="--d:.18s">
+          Most project tools are a place to write work down. Bosun does the two things a
+          board cannot: it turns a vague objective into specific assigned tasks, and then
+          it follows up with the people who owe you something.
+        </p>
+      </div>
+      <span class="swarm rise" style="--d:.26s" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+    </div>
+  </div>
+
+  <div class="question rise" style="--d:.34s">
+    <p class="kicker">The question it answers</p>
+    <q>What did I delegate that is quietly not happening?</q>
+    <p>
+      Not &ldquo;what is everyone working on&rdquo; &mdash; you can already see that. The
+      expensive gap is the task you handed off three weeks ago that nobody has touched
+      and nobody has mentioned.
+    </p>
+  </div>
+
+  <section>
+    <h2>How it works</h2>
+    <p class="sub">Four steps. Only the first one needs you.</p>
+    <ol class="steps">
+      <li>
+        <h3>State the goal</h3>
+        <p>A rough objective is enough. &ldquo;Ship the Q4 pricing page.&rdquo; No structure required.</p>
+      </li>
+      <li>
+        <h3>Answer the questions</h3>
+        <p>Bosun asks what a good chief of staff would ask before planning &mdash; scope, constraints, who signs off. Your answers become the context it plans against.</p>
+      </li>
+      <li>
+        <h3>Tasks land with names on them</h3>
+        <p>Not a backlog. Each task carries one assignee, a deadline, an estimate, and a status you can act on.</p>
+      </li>
+      <li>
+        <h3>It follows up without you</h3>
+        <p>On each person's cadence, in the tone you set. Replies come back as status updates attached to the task, not buried in a thread.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Everything it does, on the record</h2>
+    <p class="sub">
+      Bosun acts on your behalf, so every action it takes is written down where you can
+      see it. This is what a week looks like.
+    </p>
+    <div class="feed">
+      <ul>
+        <li>
+          <span class="tag tag--goal">goal analyzed</span>
+          <div>
+            <b>Read “Ship the Q4 pricing page”</b>
+            <p>Found three unstated assumptions. Asked about them.</p>
+          </div>
+        </li>
+        <li>
+          <span class="tag tag--clarification">clarification asked</span>
+          <div>
+            <b>Asked who signs off on the copy</b>
+            <p>Held the plan back until it had an answer.</p>
+          </div>
+        </li>
+        <li>
+          <span class="tag tag--tasks">tasks generated</span>
+          <div>
+            <b>Split the goal into 7 tasks</b>
+            <p>Each one small enough to finish in a day.</p>
+          </div>
+        </li>
+        <li>
+          <span class="tag tag--task">task assigned</span>
+          <div>
+            <b>Gave “Draft the tier comparison” to Ana</b>
+            <p>Deadline Thursday · est. 3h</p>
+          </div>
+        </li>
+        <li>
+          <span class="tag tag--ping">ping sent</span>
+          <div>
+            <b>Nudged Ana — two days quiet</b>
+            <p>“Still on track for Thursday, or has something landed on top of it?”</p>
+          </div>
+        </li>
+        <li>
+          <span class="tag tag--status">status checked</span>
+          <div>
+            <b>Ana replied: blocked</b>
+            <p>Waiting on legal to clear the guarantee wording.</p>
+          </div>
+        </li>
+        <li>
+          <span class="tag tag--workload">workload balanced</span>
+          <div>
+            <b>Moved two tasks off Ana</b>
+            <p>She was carrying 19h against a 12h week.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>What it isn't</h2>
+    <p class="sub">Being clear about this is most of the product.</p>
+    <div class="not">
+      <div>
+        <b>Not a board</b>
+        <p>There are columns, but they are the least interesting thing here. A board nobody updates is the problem, not the fix.</p>
+      </div>
+      <div>
+        <b>Not a chatbot</b>
+        <p>You do not prompt it. It works from a goal and a schedule, and it starts the conversations.</p>
+      </div>
+      <div>
+        <b>Not a surveillance tool</b>
+        <p>It tracks commitments, not people. Nothing here measures keystrokes, hours, or activity.</p>
+      </div>
+      <div>
+        <b>Not autonomous</b>
+        <p>It drafts, assigns, and asks. Every action is logged, and every one of them is yours to reverse.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="foot">
+      <span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      <span class="wordmark">Bosun</span>
+      <span>Built by <a href="https://github.com/melaniesigrid/northbound-studio">Northbound Software Studio</a></span>
+      <span><a href="https://github.com/melaniesigrid/bosun">Source</a></span>
+    </div>
+    <p class="note">
+      Bosun is in development and is not yet accepting signups. This page describes what
+      is being built; the application is not publicly available. The activity above is
+      an illustration, not a recording of real work.
+    </p>
+  </footer>
+</div>
+
+</body>
+</html>
