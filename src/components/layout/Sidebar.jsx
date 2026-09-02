@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import LogoIcon from "./LogoIcon";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronRight, LayoutDashboard, Target, CheckSquare, Activity, Users, Settings } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import * as taskApi from "@/api/tasks";
 import { useQuery } from "@tanstack/react-query";
 
 const WORKSPACE_NAV = [
@@ -147,7 +147,7 @@ export default function Sidebar({ collapsed, onToggle }) {
 
   const { data: tasks = [] } = useQuery({
     queryKey: ["tasks-sidebar"],
-    queryFn: () => base44.entities.Task.list("-created_date", 100),
+    queryFn: () => taskApi.list(100),
     refetchInterval: 60000,
   });
 

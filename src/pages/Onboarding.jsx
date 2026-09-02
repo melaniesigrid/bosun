@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import * as auth from "@/api/auth";
+import * as team from "@/api/team";
+import * as activity from "@/api/activity";
 import { useQueryClient } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -28,7 +30,7 @@ export default function Onboarding() {
 
   const handleSetup = async () => {
     setLoading(true);
-    await base44.auth.updateMe({
+    await auth.updateMe({
       workspace_name: workspaceName,
       onboarded: true,
       role: "lead",
@@ -43,10 +45,10 @@ export default function Onboarding() {
     // Invite members
     const validMembers = members.filter(m => m.email);
     for (const member of validMembers) {
-      await base44.users.inviteUser(member.email, "user");
+      await team.invite(member.email, "member");
     }
 
-    await base44.entities.AgentActivity.create({
+    await activity.log({
       action_type: "goal_analyzed",
       title: `Workspace "${workspaceName}" created`,
       description: `Team lead set up the workspace and invited ${validMembers.length} team member${validMembers.length !== 1 ? "s" : ""}.`

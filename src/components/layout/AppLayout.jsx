@@ -6,7 +6,7 @@ import MobileNav from "./MobileNav";
 import LogoIcon from "./LogoIcon";
 import { ChevronLeft, LogOut } from "lucide-react";
 import { useAuth } from "@/lib/AuthContext";
-import { base44 } from "@/api/base44Client";
+import * as auth from "@/api/auth";
 
 const PAGE_LABELS = {
   '/': null,
@@ -183,7 +183,7 @@ export default function AppLayout() {
                     borderRadius: 12, overflow: 'hidden', minWidth: 140,
                   }}>
                     <button
-                      onClick={() => { base44.auth.logout(); setMobileMenuOpen(false); }}
+                      onClick={() => { auth.logout(); setMobileMenuOpen(false); }}
                       style={{
                         width: '100%', display: 'flex', alignItems: 'center', gap: 10,
                         padding: '12px 16px', border: 'none', background: 'transparent',
@@ -199,7 +199,7 @@ export default function AppLayout() {
             </div>
           ) : (
             <button
-              onClick={() => base44.auth.redirectToLogin(window.location.href)}
+              onClick={() => auth.redirectToLogin()}
               style={{
                 background: '#ebe7e2',
                 boxShadow: '-3px -3px 6px rgba(255,250,244,0.78), 3px 3px 6px rgba(160,143,126,0.22)',

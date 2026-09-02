@@ -1,9 +1,12 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import * as goalApi from "@/api/goals";
+import * as taskApi from "@/api/tasks";
+import * as activity from "@/api/activity";
+import * as planner from "@/api/planner";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { CalendarIcon, Sparkles, ArrowRight, ArrowLeft, Loader2, X } from "lucide-react";
+import { CalendarIcon, Sparkles, ArrowRight, ArrowLeft, Loader2 } from "lucide-react";
 import AiAvatar from "../shared/AiAvatar";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -70,96 +73,56 @@ export default function GoalCreationWizard({ teamMembers, onComplete, onCancel }
 
   const generateQuestions = async () => {
     setLoading(true);
-    const memberNames = teamMembers.map(m => m.full_name || m.email).join(", ");
-    const res = await base44.integrations.Core.InvokeLLM({
-      prompt: `You are a smart project management AI. A team lead wants to create a goal:
-Title: "${goalTitle}"
-Description: "${goalDescription}"
-Target Date: ${targetDate ? format(targetDate, "yyyy-MM-dd") : "Not set"}
-Team Members: ${memberNames || "Not specified yet"}
-
-Generate exactly 3 short, focused clarifying questions to better understand scope, priorities, and constraints before breaking this into tasks. Questions should be practical and help create actionable tasks.
-
-Return as JSON.`,
-      response_json_schema: {
-        type: "object",
-        properties: { questions: { type: "array", items: { type: "string" } } }
-      }
+    const next = await planner.clarifyingQuestions({
+      title: goalTitle,
+      description: goalDescription,
+      targetDate,
+      teamMembers,
     });
-    setQuestions(res.questions || []);
+    setQuestions(next);
     setStep(1);
     setLoading(false);
   };
 
   const generateTasks = async () => {
     setLoading(true);
-    const memberInfo = teamMembers.map(m => ({ id: m.id, name: m.full_name || m.email, email: m.email }));
-    const qaPairs = questions.map((q, i) => `Q: ${q}\nA: ${answers[i] || "No answer"}`).join("\n\n");
+    const context = planner.buildContext(questions, answers);
 
-    const goal = await base44.entities.Goal.create({
+    const goal = await goalApi.create({
       title: goalTitle,
       description: goalDescription,
       status: "draft",
       target_date: targetDate ? format(targetDate, "yyyy-MM-dd") : undefined,
       clarifying_questions: questions.map((q, i) => ({ question: q, answer: answers[i] || "" })),
-      ai_context: qaPairs
+      ai_context: context,
     });
     setGoalId(goal.id);
 
-    await base44.entities.AgentActivity.create({
+    await activity.log({
       action_type: "goal_analyzed",
       title: `Analyzed goal: ${goalTitle}`,
-      description: `Asked 3 clarifying questions and received answers to understand scope and priorities.`,
-      related_goal_id: goal.id
+      description: `Asked ${questions.length} clarifying questions and received answers to understand scope and priorities.`,
+      related_goal_id: goal.id,
     });
 
-    const res = await base44.integrations.Core.InvokeLLM({
-      prompt: `You are a project management AI. Break down this goal into actionable tasks.
-
-Goal: "${goalTitle}"
-Description: "${goalDescription}"
-Target Date: ${targetDate ? format(targetDate, "yyyy-MM-dd") : "End of month"}
-
-Context from clarifying questions:
-${qaPairs}
-
-Available team members: ${JSON.stringify(memberInfo)}
-
-Create 4-8 tasks. For each task, suggest the best assignee based on a balanced workload (spread evenly). Set realistic deadlines working backwards from the target date. Give estimated hours for each task.
-
-Return as JSON.`,
-      response_json_schema: {
-        type: "object",
-        properties: {
-          tasks: {
-            type: "array",
-            items: {
-              type: "object",
-              properties: {
-                title: { type: "string" },
-                description: { type: "string" },
-                assignee_id: { type: "string" },
-                assignee_name: { type: "string" },
-                assignee_email: { type: "string" },
-                deadline: { type: "string" },
-                estimated_hours: { type: "number" }
-              }
-            }
-          }
-        }
-      }
-    });
-
-    setProposedTasks(res.tasks || []);
+    setProposedTasks(
+      await planner.proposeTasks({
+        title: goalTitle,
+        description: goalDescription,
+        targetDate,
+        context,
+        teamMembers,
+      }),
+    );
     setStep(2);
     setLoading(false);
   };
 
   const approveAndCreate = async () => {
     setLoading(true);
-    await base44.entities.Goal.update(goalId, { status: "active" });
-    const taskPromises = proposedTasks.map((t, i) =>
-      base44.entities.Task.create({
+    await goalApi.activate(goalId);
+    await taskApi.createMany(
+      proposedTasks.map((t, i) => ({
         title: t.title,
         description: t.description,
         goal_id: goalId,
@@ -171,15 +134,14 @@ Return as JSON.`,
         estimated_hours: t.estimated_hours,
         status: "pending",
         created_by_ai: true,
-        order: i
-      })
+        order: i,
+      })),
     );
-    await Promise.all(taskPromises);
-    await base44.entities.AgentActivity.create({
+    await activity.log({
       action_type: "tasks_generated",
       title: `Generated ${proposedTasks.length} tasks for "${goalTitle}"`,
       description: `AI created and assigned ${proposedTasks.length} tasks across team members with deadlines.`,
-      related_goal_id: goalId
+      related_goal_id: goalId,
     });
     setLoading(false);
     onComplete();

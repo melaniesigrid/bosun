@@ -1,5 +1,8 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import * as goalApi from "@/api/goals";
+import * as taskApi from "@/api/tasks";
+import * as updateApi from "@/api/updates";
+import * as activity from "@/api/activity";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -26,7 +29,7 @@ export default function StatusUpdateForm({ task, user, onSubmit }) {
     try {
       // Log the update (best-effort — RLS may restrict by role)
       try {
-        await base44.entities.Update.create({
+        await updateApi.create({
           task_id: task.id,
           task_title: task.title,
           user_id: user?.id,
@@ -38,20 +41,20 @@ export default function StatusUpdateForm({ task, user, onSubmit }) {
 
       // Update task status to match
       const taskStatusMap = { on_track: "in_progress", blocked: "blocked", need_help: "need_help", done: "done" };
-      await base44.entities.Task.update(task.id, { status: taskStatusMap[status] });
+      await taskApi.setStatus(task.id, taskStatusMap[status]);
 
       // Auto-complete goal if all tasks are done; revert to active if not (best-effort)
       if (task.goal_id) {
         try {
-          const allGoalTasks = await base44.entities.Task.filter({ goal_id: task.goal_id });
+          const allGoalTasks = await taskApi.listForGoal(task.goal_id);
           const taskStatusMap2 = { on_track: "in_progress", blocked: "blocked", need_help: "need_help", done: "done" };
           const allDone = allGoalTasks.every(t => t.id === task.id ? taskStatusMap2[status] === "done" : t.status === "done");
           if (allDone && allGoalTasks.length > 0) {
-            await base44.entities.Goal.update(task.goal_id, { status: "completed" });
+            await goalApi.complete(task.goal_id);
           } else {
-            const goal = await base44.entities.Goal.filter({ id: task.goal_id });
-            if (goal[0]?.status === "completed") {
-              await base44.entities.Goal.update(task.goal_id, { status: "active" });
+            const goal = await goalApi.get(task.goal_id);
+            if (goal?.status === "completed") {
+              await goalApi.activate(task.goal_id);
             }
           }
         } catch (_) {}
@@ -59,7 +62,7 @@ export default function StatusUpdateForm({ task, user, onSubmit }) {
 
       // Log activity (best-effort)
       try {
-        await base44.entities.AgentActivity.create({
+        await activity.log({
           action_type: "status_checked",
           title: `${user?.full_name || "Team member"} updated "${task.title}"`,
           description: `Status: ${status}${message ? ` — "${message}"` : ""}`,

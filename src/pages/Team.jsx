@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { base44 } from "@/api/base44Client";
+import * as agentApi from "@/api/agents";
+import * as taskApi from "@/api/tasks";
+import * as team from "@/api/team";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
@@ -27,13 +29,13 @@ export default function Team() {
 
   const { data: agents = [], refetch: refetchAgents, isLoading: loadingAgents } = useQuery({
     queryKey: ["agents"],
-    queryFn: () => base44.entities.Agent.list("-created_date", 50),
+    queryFn: () => agentApi.list(50),
   });
 
   const handleCreateAgent = async (e) => {
     e.preventDefault();
     setCreatingAgent(true);
-    await base44.entities.Agent.create({
+    await agentApi.create({
       name: agentForm.name,
       description: agentForm.description,
       instructions: agentForm.instructions,
@@ -46,12 +48,12 @@ export default function Team() {
 
   const { data: members = [] } = useQuery({
     queryKey: ["team"],
-    queryFn: () => base44.entities.User.list(),
+    queryFn: () => team.listMembers(),
   });
 
   const { data: tasks = [] } = useQuery({
     queryKey: ["tasks"],
-    queryFn: () => base44.entities.Task.list("-created_date", 200),
+    queryFn: () => taskApi.list(200),
   });
 
   const getMemberStats = (member) => {
@@ -63,7 +65,7 @@ export default function Team() {
   };
 
   const handleRemove = async (memberId) => {
-    await base44.entities.User.delete(memberId);
+    await team.removeMember(memberId);
     setConfirmRemove(null);
     queryClient.invalidateQueries({ queryKey: ["team"] });
   };
@@ -71,7 +73,7 @@ export default function Team() {
   const handleInvite = async () => {
     if (!inviteEmail) return;
     setInviting(true);
-    await base44.users.inviteUser(inviteEmail, inviteRole === "lead" ? "admin" : "user");
+    await team.invite(inviteEmail, inviteRole);
     setInviteEmail("");
     setShowInvite(false);
     setInviting(false);

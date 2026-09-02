@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import * as taskApi from "@/api/tasks";
+import * as team from "@/api/team";
 import { useQuery } from "@tanstack/react-query";
 import { X } from "lucide-react";
 
@@ -35,7 +36,7 @@ export default function TaskFormModal({ task = null, goalId, goals = [], onClose
 
   const { data: teamMembers = [] } = useQuery({
     queryKey: ["team"],
-    queryFn: () => base44.entities.User.list(),
+    queryFn: () => team.listMembers(),
   });
 
   // sync goal_id if goalId prop changes
@@ -69,9 +70,9 @@ export default function TaskFormModal({ task = null, goalId, goals = [], onClose
       }
 
       if (isEdit) {
-        await base44.entities.Task.update(task.id, payload);
+        await taskApi.update(task.id, payload);
       } else {
-        await base44.entities.Task.create(payload);
+        await taskApi.create(payload);
       }
       onSave && onSave();
     } catch (err) {

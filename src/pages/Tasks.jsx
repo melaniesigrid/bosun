@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import * as taskApi from "@/api/tasks";
 import { useQuery } from "@tanstack/react-query";
 import { CheckSquare } from "lucide-react";
 import TaskCard from "../components/tasks/TaskCard";
@@ -17,7 +17,7 @@ export default function Tasks() {
 
   const { data: tasks = [] } = useQuery({
     queryKey: ["tasks-all"],
-    queryFn: () => base44.entities.Task.list("-created_date", 500),
+    queryFn: () => taskApi.list(500),
   });
 
   const filteredTasks = filter === "all" ? tasks : tasks.filter(t => t.status === filter);

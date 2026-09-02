@@ -1,5 +1,8 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import React, { useState, useEffect } from "react";
+import * as auth from "@/api/auth";
+import * as goalApi from "@/api/goals";
+import * as taskApi from "@/api/tasks";
+import * as activity from "@/api/activity";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { Plus, X, ArrowRight, LogOut } from "lucide-react";
@@ -40,15 +43,15 @@ export default function Dashboard() {
   const { user } = useAuth();
   const { data: goals = [] } = useQuery({
     queryKey: ["goals"],
-    queryFn: () => base44.entities.Goal.list("-created_date", 50)
+    queryFn: () => goalApi.list(50)
   });
   const { data: tasks = [] } = useQuery({
     queryKey: ["tasks"],
-    queryFn: () => base44.entities.Task.list("-created_date", 100)
+    queryFn: () => taskApi.list(100)
   });
   const { data: activities = [] } = useQuery({
     queryKey: ["activities"],
-    queryFn: () => base44.entities.AgentActivity.list("-created_date", 20),
+    queryFn: () => activity.listRecent(20),
     refetchInterval: 15000
   });
 
@@ -229,7 +232,7 @@ export default function Dashboard() {
                       minWidth: 160,
                     }}>
                       <button
-                        onClick={() => { base44.auth.logout(); }}
+                        onClick={() => { auth.logout(); }}
                         style={{
                           width: '100%', display: 'flex', alignItems: 'center', gap: 10,
                           padding: '12px 16px', border: 'none', background: 'transparent',
@@ -249,7 +252,7 @@ export default function Dashboard() {
             ) : (
               <button
                 className="btn-neu flex items-center gap-2"
-                onClick={() => base44.auth.redirectToLogin(window.location.href)}
+                onClick={() => auth.redirectToLogin()}
                 style={{
                   fontSize: 12, fontWeight: 600, letterSpacing: '0.08em',
                   textTransform: 'uppercase', padding: '11px 20px', color: '#3a3a3a', whiteSpace: 'nowrap',

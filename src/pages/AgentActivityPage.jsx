@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { base44 } from "@/api/base44Client";
+import * as activity from "@/api/activity";
 import { useQuery } from "@tanstack/react-query";
 import { Activity, Search } from "lucide-react";
 import ActivityItem from "../components/activity/ActivityItem";
@@ -8,7 +8,7 @@ import ActivityItem from "../components/activity/ActivityItem";
 export default function AgentActivityPage() {
   const { data: activities = [], isLoading } = useQuery({
     queryKey: ["activities-all"],
-    queryFn: () => base44.entities.AgentActivity.list("-created_date", 100),
+    queryFn: () => activity.listRecent(100),
     refetchInterval: 15000,
   });
 

@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { base44 } from "@/api/base44Client";
+import * as auth from "@/api/auth";
+import * as goalApi from "@/api/goals";
+import * as taskApi from "@/api/tasks";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -37,20 +39,17 @@ export default function GoalDetail() {
 
   const { data: goal } = useQuery({
     queryKey: ["goal", id],
-    queryFn: async () => {
-      const goals = await base44.entities.Goal.filter({ id });
-      return goals[0];
-    },
+    queryFn: () => goalApi.get(id),
   });
 
   const { data: tasks = [] } = useQuery({
     queryKey: ["goal-tasks", id],
-    queryFn: () => base44.entities.Task.filter({ goal_id: id }),
+    queryFn: () => taskApi.listForGoal(id),
   });
 
   const { data: user } = useQuery({
     queryKey: ["me"],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => auth.me(),
   });
 
   if (!goal) {
@@ -66,14 +65,13 @@ export default function GoalDetail() {
   const progress = tasks.length > 0 ? Math.round((doneTasks / tasks.length) * 100) : 0;
 
   const handleMarkComplete = async () => {
-    await base44.entities.Goal.update(goal.id, { status: "completed" });
+    await goalApi.complete(goal.id);
     queryClient.invalidateQueries({ queryKey: ["goal", id] });
   };
 
   const handleDelete = async () => {
     setDeleting(true);
-    await base44.entities.Task.deleteMany({ goal_id: id });
-    await base44.entities.Goal.delete(id);
+    await goalApi.remove(id);
     queryClient.invalidateQueries({ queryKey: ["goals"] });
     navigate("/goals");
   };
@@ -87,7 +85,7 @@ export default function GoalDetail() {
   };
 
   const handleDeleteTask = async (taskId) => {
-    await base44.entities.Task.delete(taskId);
+    await taskApi.remove(taskId);
     setConfirmDeleteTask(null);
     refreshTasks();
   };

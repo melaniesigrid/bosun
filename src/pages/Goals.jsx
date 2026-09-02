@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import * as goalApi from "@/api/goals";
+import * as taskApi from "@/api/tasks";
+import * as team from "@/api/team";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus, Target, X } from "lucide-react";
 import GoalCard from "../components/goals/GoalCard";
@@ -20,23 +22,22 @@ export default function Goals() {
 
   const { data: goals = [] } = useQuery({
     queryKey: ["goals"],
-    queryFn: () => base44.entities.Goal.list("-created_date", 50),
+    queryFn: () => goalApi.list(50),
   });
   const { data: tasks = [] } = useQuery({
     queryKey: ["tasks"],
-    queryFn: () => base44.entities.Task.list("-created_date", 200),
+    queryFn: () => taskApi.list(200),
   });
   const { data: teamMembers = [] } = useQuery({
     queryKey: ["team"],
-    queryFn: () => base44.entities.User.list(),
+    queryFn: () => team.listMembers(),
   });
 
   const filteredGoals = filter === "all" ? goals : goals.filter(g => g.status === filter);
   const countFor = (s) => s === "all" ? goals.length : goals.filter(g => g.status === s).length;
 
   const handleDeleteGoal = async (goalId) => {
-    await base44.entities.Task.deleteMany({ goal_id: goalId });
-    await base44.entities.Goal.delete(goalId);
+    await goalApi.remove(goalId);
     queryClient.invalidateQueries({ queryKey: ["goals"] });
     queryClient.invalidateQueries({ queryKey: ["tasks"] });
   };

@@ -1,8 +1,11 @@
-import React, { useState, useMemo } from "react";
-import { base44 } from "@/api/base44Client";
+import React, { useState } from "react";
+import * as auth from "@/api/auth";
+import * as taskApi from "@/api/tasks";
+import * as updateApi from "@/api/updates";
+import * as pingApi from "@/api/pings";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { CheckSquare, Bell } from "lucide-react";
+import { CheckSquare } from "lucide-react";
 import TaskCard from "../components/tasks/TaskCard";
 import StatusUpdateForm from "../components/tasks/StatusUpdateForm";
 
@@ -66,21 +69,18 @@ export default function MyTasks() {
 
   const { data: user } = useQuery({
     queryKey: ["me"],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => auth.me(),
   });
 
   const { data: tasks = [] } = useQuery({
     queryKey: ["my-tasks", user?.id],
-    queryFn: async () => {
-      const res = await base44.functions.invoke('getMyTasks', {});
-      return res.data?.tasks || [];
-    },
+    queryFn: () => taskApi.listMine(),
     enabled: !!user,
   });
 
   const { data: updates = [] } = useQuery({
     queryKey: ["my-task-updates", user?.id],
-    queryFn: () => base44.entities.Update.list('-created_date', 500),
+    queryFn: () => updateApi.listRecent(500),
     enabled: !!user,
   });
 
@@ -95,7 +95,7 @@ export default function MyTasks() {
 
   const { data: pings = [] } = useQuery({
     queryKey: ["my-pings", user?.id],
-    queryFn: () => base44.entities.Ping.filter({ assignee_id: user?.id, status: "sent" }),
+    queryFn: () => pingApi.listOpenFor(user?.id),
     enabled: !!user?.id,
   });
 

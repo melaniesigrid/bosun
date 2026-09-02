@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
+import * as auth from "@/api/auth";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Save } from "lucide-react";
@@ -50,7 +50,7 @@ export default function SettingsPage() {
 
   const { data: user } = useQuery({
     queryKey: ["me"],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => auth.me(),
   });
 
   useEffect(() => {
@@ -67,7 +67,7 @@ export default function SettingsPage() {
 
   const handleSave = async () => {
     setSaving(true);
-    await base44.auth.updateMe({ settings, workspace_name: workspaceName });
+    await auth.updateMe({ settings, workspace_name: workspaceName });
     queryClient.invalidateQueries({ queryKey: ["me"] });
     toast({ title: "Settings saved", description: "Your preferences have been updated." });
     setSaving(false);

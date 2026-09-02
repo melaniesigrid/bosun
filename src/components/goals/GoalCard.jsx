@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
 import { Trash2, Pencil } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import * as goalApi from "@/api/goals";
 
 const statusColors = {
   active:    '#2ECC8A',
@@ -43,7 +43,7 @@ export default function GoalCard({ goal, tasks, onDelete, onEdit }) {
     e.preventDefault();
     e.stopPropagation();
     setSaving(true);
-    await base44.entities.Goal.update(goal.id, {
+    await goalApi.update(goal.id, {
       title: editData.title,
       description: editData.description,
       status: editData.status,
