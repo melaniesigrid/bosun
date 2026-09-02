@@ -1,0 +1,60 @@
+{
+  "name": "Ping",
+  "type": "object",
+  "properties": {
+    "task_id": {
+      "type": "string"
+    },
+    "task_title": {
+      "type": "string"
+    },
+    "assignee_id": {
+      "type": "string"
+    },
+    "assignee_name": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string",
+      "description": "AI-generated ping message"
+    },
+    "responded_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "response": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "sent",
+        "read",
+        "responded"
+      ],
+      "default": "sent"
+    }
+  },
+  "required": [
+    "task_id",
+    "assignee_id"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": null,
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

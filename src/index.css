@@ -1,0 +1,296 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Datatype:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Fonts */
+    --font-body: 'DM Sans', system-ui, sans-serif;
+
+    /* Neumorphic canvas */
+    --bg-canvas:      30 10% 90%;   /* #ebe7e2 warm grey */
+    --bg-surface:     30 8% 92%;    /* #eeeae6 warm surface */
+    --bg-surface-alt: 30 7% 94%;    /* #f2efeb warm alt */
+
+    /* Text — all meet 4.5:1 contrast on warm canvas */
+    --text-primary:   25 15% 16%;   /* #2e2a26 — ~9:1 */
+    --text-secondary: 25 8% 38%;    /* #665f57 — ~4.6:1 */
+    --text-muted:     25 6% 45%;    /* #7a7470 — ~4.5:1 */
+
+    /* Divider */
+    --line:           30 10% 83%;   /* #d9d3cc */
+
+    /* Accent palette — brand palette */
+    --sage:           152 63% 44%;  /* #2ECC8A green */
+    --terracotta:     3 100% 73%;   /* #FF8077 orange-red */
+    --blush:          340 78% 86%;  /* #F9AEBE pink */
+    --dustyblue:      190 80% 88%;  /* #B8EFF5 light blue */
+    --yellow:         58 100% 57%;  /* #F5F01A yellow */
+    --neon:           82 100% 59%;  /* #CAFF2D neon green (kept) */
+    --purple:         264 67% 83%;  /* #C9B3F5 lavender */
+    --lavender:       264 67% 83%;  /* #C9B3F5 lavender */
+    --brown:          33 40% 57%;   /* #C4996A tan/brown */
+
+    /* Neumorphic shadows — tuned to warm canvas #ebe7e2 */
+    --shadow-out:    -8px -8px 16px rgba(255,250,244,0.78), 8px 8px 18px rgba(160,143,126,0.31);
+    --shadow-out-sm: -5px -5px 10px rgba(255,250,244,0.78), 5px 5px 12px rgba(160,143,126,0.27);
+    --shadow-in:     inset -4px -4px 8px rgba(255,250,244,0.68), inset 4px 4px 8px rgba(160,143,126,0.24);
+    --shadow-in-sm:  inset -3px -3px 6px rgba(255,250,244,0.68), inset 3px 3px 6px rgba(160,143,126,0.24);
+
+    /* Geometry */
+    --radius-card:    16px;
+    --radius-sidebar: 20px;
+    --radius-input:   12px;
+    --radius-chip:    8px;
+    --radius-button:  12px;
+    --radius-pill:    9999px;
+
+    /* ── Tailwind compat aliases ── */
+    --background:         var(--bg-canvas);
+    --foreground:         var(--text-primary);
+    --card:               var(--bg-surface);
+    --card-foreground:    var(--text-primary);
+    --popover:            var(--bg-surface);
+    --popover-foreground: var(--text-primary);
+    --primary:            var(--text-primary);
+    --primary-foreground: 0 0% 95%;
+    --secondary:          var(--bg-surface-alt);
+    --secondary-foreground: var(--text-secondary);
+    --muted:              var(--bg-surface-alt);
+    --muted-foreground:   var(--text-secondary);
+    --accent:             var(--bg-surface-alt);
+    --accent-foreground:  var(--text-primary);
+    --destructive:        35 62% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --border:             var(--line);
+    --input:              var(--line);
+    --ring:               var(--line);
+    --radius:             16px;
+
+    --sidebar-background: var(--bg-surface);
+    --sidebar-foreground: var(--text-primary);
+    --sidebar-primary:    var(--text-primary);
+    --sidebar-primary-foreground: 0 0% 95%;
+    --sidebar-accent:     var(--bg-surface-alt);
+    --sidebar-accent-foreground: var(--text-primary);
+    --sidebar-border:     var(--line);
+    --sidebar-ring:       var(--line);
+
+    --success:            142 45% 50%;
+    --success-foreground: 0 0% 100%;
+    --warning:            35 62% 58%;
+    --warning-foreground: 0 0% 100%;
+
+    --status-success: #2ECC8A;  /* green */
+    --status-warning: #FF8077;  /* orange-red */
+    --status-danger:  #FF8077;  /* orange-red */
+    --status-info:    #C9B3F5;  /* lavender */
+    --status-purple:  #C9B3F5;  /* lavender */
+    --status-neutral: #2e2e2e;
+    --status-muted:   #737373;
+
+    --chart-1: var(--text-primary);
+    --chart-2: var(--text-secondary);
+    --chart-3: var(--text-muted);
+    --chart-4: var(--dustyblue);
+    --chart-5: var(--blush);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    font-family: var(--font-body);
+    background: #ebe7e2;
+    color: hsl(var(--text-primary));
+  }
+  h1, h2, h3 {
+    font-family: var(--font-body);
+    font-weight: 500;
+  }
+}
+
+/* ── Neumorphic raised surface ── */
+.neu-raised {
+  background: #eeeae6;
+  box-shadow: var(--shadow-out);
+  border-radius: var(--radius-card);
+}
+
+/* ── Neumorphic small raised ── */
+.neu-raised-sm {
+  background: #eeeae6;
+  box-shadow: var(--shadow-out-sm);
+  border-radius: var(--radius-chip);
+}
+
+/* ── Neumorphic inset ── */
+.neu-inset {
+  background: #ebe7e2;
+  box-shadow: var(--shadow-in);
+  border-radius: var(--radius-card);
+}
+
+/* ── Neumorphic inset small ── */
+.neu-inset-sm {
+  background: #ebe7e2;
+  box-shadow: var(--shadow-in-sm);
+  border-radius: var(--radius-chip);
+}
+
+/* ── Sidebar ── */
+.sidebar-float {
+  background: #eeeae6;
+  box-shadow: var(--shadow-out);
+  border-radius: var(--radius-sidebar);
+}
+
+/* ── Card gradient border (kept as alias for backward compat) ── */
+.card-gradient-border {
+  background: #eeeae6;
+  box-shadow: var(--shadow-out);
+  border-radius: var(--radius-card);
+}
+
+/* ── Active nav item inset ── */
+.nav-active {
+  box-shadow: var(--shadow-in-sm);
+  background: #ebe7e2;
+  border-radius: 10px;
+}
+
+/* ── Button neumorphic ── */
+.btn-neu {
+  background: #eeeae6;
+  box-shadow: var(--shadow-out-sm);
+  border-radius: var(--radius-button);
+  border: none;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease;
+}
+.btn-neu:hover {
+  box-shadow: -3px -3px 6px rgba(255,250,244,0.78), 3px 3px 8px rgba(160,143,126,0.26);
+}
+.btn-neu:active {
+  box-shadow: var(--shadow-in-sm);
+}
+
+/* ── Dark pill button ── */
+.btn-dark-neu {
+  background: #3a3a3a;
+  box-shadow: -4px -4px 8px rgba(255,255,255,0.085), 4px 4px 10px rgba(0,0,0,0.30);
+  border-radius: var(--radius-button);
+  border: none;
+  cursor: pointer;
+  color: #f1f1f0;
+  transition: box-shadow 0.15s ease;
+}
+.btn-dark-neu:hover {
+  box-shadow: -2px -2px 5px rgba(255,255,255,0.12), 2px 2px 6px rgba(0,0,0,0.4);
+}
+
+/* ── Progress track (inset) ── */
+.progress-track {
+  background: #ddd8d2;
+  box-shadow: var(--shadow-in-sm);
+  border-radius: 9999px;
+  overflow: hidden;
+  height: 6px;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: #2ECC8A;
+}
+
+/* ── Subtle pulse for blocked dot ── */
+@keyframes pulse-danger {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+.dot-pulse { animation: pulse-danger 2s ease-in-out infinite; }
+
+/* ── Tablet grid override ── */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .tablet-grid {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto !important;
+    flex: none !important;
+    min-height: unset !important;
+  }
+}
+
+/* ── Mobile grid override ── */
+@media (max-width: 767px) {
+  .tablet-grid {
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto !important;
+    flex: none !important;
+    min-height: unset !important;
+  }
+  .mobile-header-hide {
+    display: none !important;
+  }
+  /* Image+circle row on mobile — side by side 50/50 */
+  #dashboard-grid > div:first-child {
+    flex-direction: row !important;
+  }
+  #dashboard-grid > div:first-child > div {
+    width: 50% !important;
+    max-width: 50% !important;
+    flex: 1 1 50% !important;
+    height: 150px !important;
+  }
+  /* Bottom feed/goals cards — natural height */
+  #dashboard-grid > div:nth-child(3),
+  #dashboard-grid > div:nth-child(4) {
+    min-height: 260px;
+  }
+  /* Stats card — compact row layout on mobile */
+  .mobile-stats-card {
+    flex-direction: row !important;
+    align-items: stretch !important;
+    justify-content: space-around !important;
+    gap: 6px !important;
+    padding: 14px 10px !important;
+  }
+  .mobile-stats-card > a {
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+  .mobile-stats-card > a > div {
+    align-items: center !important;
+    padding: 8px 4px !important;
+  }
+  /* Shrink the number boxes on mobile */
+  .stats-number-box {
+    width: 56px !important;
+    height: 56px !important;
+  }
+  .stats-number-box > span {
+    font-size: 22px !important;
+  }
+}
+
+/* ── Mobile page padding override ── */
+@media (max-width: 767px) {
+  .page-container {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+}
+
+/* ── Pip / status dot ── */
+.pip {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}

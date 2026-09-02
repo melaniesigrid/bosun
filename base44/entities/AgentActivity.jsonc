@@ -1,0 +1,63 @@
+{
+  "name": "AgentActivity",
+  "type": "object",
+  "properties": {
+    "action_type": {
+      "type": "string",
+      "enum": [
+        "goal_analyzed",
+        "tasks_generated",
+        "task_assigned",
+        "ping_sent",
+        "digest_created",
+        "status_checked",
+        "workload_balanced",
+        "clarification_asked"
+      ],
+      "description": "Type of AI action"
+    },
+    "title": {
+      "type": "string",
+      "description": "Human-readable action title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of what the AI did"
+    },
+    "related_goal_id": {
+      "type": "string"
+    },
+    "related_task_id": {
+      "type": "string"
+    },
+    "related_user_id": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Any additional data about the action"
+    }
+  },
+  "required": [
+    "action_type",
+    "title"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": null,
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

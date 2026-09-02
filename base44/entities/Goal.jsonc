@@ -1,0 +1,77 @@
+{
+  "name": "Goal",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "High-level objective"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the goal"
+    },
+    "owner_id": {
+      "type": "string",
+      "description": "User ID of the goal owner"
+    },
+    "owner_name": {
+      "type": "string",
+      "description": "Name of the goal owner"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "completed",
+        "paused"
+      ],
+      "default": "draft"
+    },
+    "target_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Target completion date"
+    },
+    "clarifying_questions": {
+      "type": "array",
+      "description": "AI-generated clarifying questions",
+      "items": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string"
+          },
+          "answer": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ai_context": {
+      "type": "string",
+      "description": "Combined context from answers for AI task generation"
+    }
+  },
+  "required": [
+    "title"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": null,
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

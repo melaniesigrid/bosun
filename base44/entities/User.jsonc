@@ -1,0 +1,57 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "lead",
+        "member"
+      ],
+      "default": "member",
+      "description": "Role in the workspace"
+    },
+    "workspace_name": {
+      "type": "string",
+      "description": "Name of the user's workspace"
+    },
+    "onboarded": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the user has completed onboarding"
+    },
+    "settings": {
+      "type": "object",
+      "description": "User preferences like ping frequency, working hours, AI tone",
+      "properties": {
+        "ping_frequency": {
+          "type": "string",
+          "enum": [
+            "daily",
+            "twice_daily",
+            "weekly"
+          ],
+          "default": "daily"
+        },
+        "working_hours_start": {
+          "type": "string",
+          "default": "09:00"
+        },
+        "working_hours_end": {
+          "type": "string",
+          "default": "17:00"
+        },
+        "ai_tone": {
+          "type": "string",
+          "enum": [
+            "friendly",
+            "direct",
+            "formal"
+          ],
+          "default": "friendly"
+        }
+      }
+    }
+  },
+  "required": []
+}

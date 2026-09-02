@@ -1,0 +1,80 @@
+{
+  "name": "Task",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "goal_id": {
+      "type": "string",
+      "description": "Associated goal ID"
+    },
+    "goal_title": {
+      "type": "string",
+      "description": "Title of the associated goal"
+    },
+    "assignee_id": {
+      "type": "string",
+      "description": "Assigned user ID"
+    },
+    "assignee_name": {
+      "type": "string",
+      "description": "Assigned user name"
+    },
+    "assignee_email": {
+      "type": "string",
+      "description": "Assigned user email"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "blocked",
+        "done",
+        "need_help"
+      ],
+      "default": "pending"
+    },
+    "estimated_hours": {
+      "type": "number"
+    },
+    "created_by_ai": {
+      "type": "boolean",
+      "default": true
+    },
+    "order": {
+      "type": "number",
+      "description": "Display order within goal"
+    }
+  },
+  "required": [
+    "title",
+    "goal_id"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": null,
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
