@@ -65,9 +65,23 @@ the `onboarded` flag the onboarding route already reads. `AuthContext.jsx`
 already models `user_not_registered` and `auth_required` as distinct states —
 preserve both.
 
-**4. Data layer.**
-Route handlers behind the facade. Every query takes an explicit `tenantId`. No
-query in the codebase should be able to omit it.
+**4. Data layer. — QUERIES WRITTEN, NOT YET SERVED**
+`server/db/queries.js` holds every read and write, tested in
+`test/queries.test.js` against the same PGlite instance the schema runs on.
+
+Every function takes `tenantId` as its second argument and every statement
+filters on it — isolation is something the signature forces a caller to supply
+rather than something a policy file declares. The cross-tenant tests are the
+ones that matter: fetching, updating and deleting another workspace's rows by
+id all return null rather than succeeding.
+
+Updates and inserts go through a hard-coded column allow-list per table and
+throw on anything outside it, so a stray `tenant_id` in a patch is an error
+rather than a privilege escalation.
+
+`db` is anything exposing `query(text, params)`, which is why the tests run real
+Postgres with no server installed. Still to do: an HTTP layer over these, and
+pointing `src/api/` at it instead of at Base44.
 
 **5. LLM.**
 `InvokeLLM` moves server-side. Both prompts already live in `src/api/planner.js`
