@@ -37,9 +37,15 @@ npm run dev
 ```
 
 ```bash
+npm test         # planner logic — no install or backend needed
 npm run build
 npm run lint
 ```
+
+`npm test` covers `src/api/planner-core.js`, the half of the planning code
+that has no I/O. It is the only thing here that turns a model response into
+rows, so it is the thing worth a regression net while the backend underneath
+it is being replaced.
 
 ## Architecture
 
