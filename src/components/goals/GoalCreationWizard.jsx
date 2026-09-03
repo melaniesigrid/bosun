@@ -70,81 +70,116 @@ export default function GoalCreationWizard({ teamMembers, onComplete, onCancel }
   const [proposedTasks, setProposedTasks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [goalId, setGoalId] = useState(null);
+  const [error, setError] = useState(null);
 
   const generateQuestions = async () => {
     setLoading(true);
-    const next = await planner.clarifyingQuestions({
-      title: goalTitle,
-      description: goalDescription,
-      targetDate,
-      teamMembers,
-    });
-    setQuestions(next);
-    setStep(1);
-    setLoading(false);
+    setError(null);
+    try {
+      const next = await planner.clarifyingQuestions({
+        title: goalTitle,
+        description: goalDescription,
+        targetDate,
+        teamMembers,
+      });
+      // A model that returns nothing usable should not advance the wizard to an
+      // empty question step.
+      if (!next.length) throw new Error("no questions came back");
+      setQuestions(next);
+      setStep(1);
+    } catch (err) {
+      setError("I could not draft the questions just now. Try again.");
+      console.error("clarifyingQuestions failed", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const generateTasks = async () => {
     setLoading(true);
+    setError(null);
     const context = planner.buildContext(questions, answers);
 
-    const goal = await goalApi.create({
+    try {
+      const goal = await goalApi.create({
       title: goalTitle,
       description: goalDescription,
       status: "draft",
-      target_date: targetDate ? format(targetDate, "yyyy-MM-dd") : undefined,
-      clarifying_questions: questions.map((q, i) => ({ question: q, answer: answers[i] || "" })),
-      ai_context: context,
-    });
-    setGoalId(goal.id);
+        target_date: targetDate ? format(targetDate, "yyyy-MM-dd") : undefined,
+        clarifying_questions: questions.map((q, i) => ({ question: q, answer: answers[i] || "" })),
+        ai_context: context,
+      });
+      setGoalId(goal.id);
 
-    await activity.log({
-      action_type: "goal_analyzed",
-      title: `Analyzed goal: ${goalTitle}`,
-      description: `Asked ${questions.length} clarifying questions and received answers to understand scope and priorities.`,
-      related_goal_id: goal.id,
-    });
+      // The goal is saved as a draft at this point, so a failure below costs the
+      // plan, not the goal. Logging is best-effort and must not block the plan.
+      activity
+        .log({
+          action_type: "goal_analyzed",
+          title: `Analyzed goal: ${goalTitle}`,
+          description: `Asked ${questions.length} clarifying questions and received answers to understand scope and priorities.`,
+          related_goal_id: goal.id,
+        })
+        .catch((err) => console.error("activity.log failed", err));
 
-    setProposedTasks(
-      await planner.proposeTasks({
+      const proposed = await planner.proposeTasks({
         title: goalTitle,
         description: goalDescription,
         targetDate,
         context,
         teamMembers,
-      }),
-    );
-    setStep(2);
-    setLoading(false);
+      });
+      if (!proposed.length) throw new Error("no usable tasks came back");
+      setProposedTasks(proposed);
+      setStep(2);
+    } catch (err) {
+      setError("I saved the goal as a draft but could not build the plan. Try again.");
+      console.error("generateTasks failed", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const approveAndCreate = async () => {
     setLoading(true);
-    await goalApi.activate(goalId);
-    await taskApi.createMany(
-      proposedTasks.map((t, i) => ({
-        title: t.title,
-        description: t.description,
-        goal_id: goalId,
-        goal_title: goalTitle,
-        assignee_id: t.assignee_id,
-        assignee_name: t.assignee_name,
-        assignee_email: t.assignee_email,
-        deadline: t.deadline,
-        estimated_hours: t.estimated_hours,
-        status: "pending",
-        created_by_ai: true,
-        order: i,
-      })),
-    );
-    await activity.log({
-      action_type: "tasks_generated",
-      title: `Generated ${proposedTasks.length} tasks for "${goalTitle}"`,
-      description: `AI created and assigned ${proposedTasks.length} tasks across team members with deadlines.`,
-      related_goal_id: goalId,
-    });
-    setLoading(false);
-    onComplete();
+    setError(null);
+    try {
+      // Tasks first, then activate. The other order leaves an active goal with
+      // no tasks under it if the writes fail.
+      await taskApi.createMany(
+        proposedTasks.map((t, i) => ({
+          title: t.title,
+          description: t.description,
+          goal_id: goalId,
+          goal_title: goalTitle,
+          assignee_id: t.assignee_id,
+          assignee_name: t.assignee_name,
+          assignee_email: t.assignee_email,
+          deadline: t.deadline,
+          estimated_hours: t.estimated_hours,
+          status: "pending",
+          created_by_ai: true,
+          order: i,
+        })),
+      );
+      await goalApi.activate(goalId);
+
+      activity
+        .log({
+          action_type: "tasks_generated",
+          title: `Generated ${proposedTasks.length} tasks for "${goalTitle}"`,
+          description: `AI created and assigned ${proposedTasks.length} tasks across team members with deadlines.`,
+          related_goal_id: goalId,
+        })
+        .catch((err) => console.error("activity.log failed", err));
+
+      onComplete();
+    } catch (err) {
+      setError("The tasks did not save. The goal is still a draft — try again.");
+      console.error("approveAndCreate failed", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const updateTask = (index, field, value) => {
@@ -157,6 +192,22 @@ export default function GoalCreationWizard({ teamMembers, onComplete, onCancel }
 
   return (
     <div style={{ maxWidth: 680 }}>
+      {error && (
+        <div
+          role="alert"
+          style={{
+            display: 'flex', alignItems: 'flex-start', gap: 10,
+            background: '#ebe7e2', borderRadius: 12, padding: '12px 16px', marginBottom: 18,
+            boxShadow: 'inset -3px -3px 6px rgba(255,250,244,0.68), inset 3px 3px 6px rgba(160,143,126,0.24)',
+          }}
+        >
+          <span aria-hidden="true" style={{
+            width: 7, height: 7, borderRadius: '50%', background: '#d1594e',
+            flexShrink: 0, marginTop: 6,
+          }} />
+          <p style={{ fontSize: 13, color: '#3a3a3a', lineHeight: 1.5, margin: 0 }}>{error}</p>
+        </div>
+      )}
       <AnimatePresence mode="wait">
 
         {/* ── Step 0: Describe goal ── */}

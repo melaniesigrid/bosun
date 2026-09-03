@@ -22,13 +22,19 @@ They have to be reimplemented as explicit tenant scoping, not assumed.
 
 ## Order of work
 
-**1. Build the facade first, against Base44.**
-Introduce `src/api/` modules — `goals.js`, `tasks.js`, `pings.js`, `updates.js`,
-`agent.js`, `auth.js` — that expose exactly the operations the UI needs and are
-initially implemented by calling `base44Client`. Rewrite the 18 importing files
-to use those instead. Nothing changes behaviourally; the app still runs. This is
-the only step that touches UI code, and it can be verified against the live
-Base44 backend before any backend exists.
+**1. Build the facade first, against Base44. — DONE**
+`src/api/` holds nine modules — `goals`, `tasks`, `updates`, `pings`,
+`activity`, `agents`, `team`, `auth`, `planner` — that expose exactly the
+operations the UI needs, each implemented by calling `base44Client`. All 69 call
+sites across 17 components now go through them, and `base44Client` is imported
+by `src/api/` and nowhere else. Verify with:
+
+```bash
+grep -rn "base44Client" src/ | grep -v "^src/api/"   # must return nothing
+```
+
+Steps 2-6 replace the insides of those nine modules. None of them should need to
+open a component.
 
 **2. Schema.**
 Translate `base44/entities/*.jsonc` to Drizzle. Add what Base44 supplied
@@ -48,7 +54,8 @@ Route handlers behind the facade. Every query takes an explicit `tenantId`. No
 query in the codebase should be able to omit it.
 
 **5. LLM.**
-`InvokeLLM` moves server-side. Structured output with a schema and validation on
+`InvokeLLM` moves server-side. Both prompts already live in `src/api/planner.js`
+rather than in the wizard, so this is a change to one file. Structured output with a schema and validation on
 the way back — the goal wizard and task generation both parse the response into
 records that get written to the database, so an unvalidated response becomes
 corrupt data, not a bad string. Per-tenant token caps.
