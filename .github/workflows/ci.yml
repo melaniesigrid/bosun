@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Test
+        run: npm test
+
+      - name: Lint
+        run: npm run lint
+
+      # No Base44 credentials here on purpose. The build warns that it does not
+      # know its app id and still has to succeed — this job proves the bundle
+      # compiles, not that the backend answers.
+      - name: Build
+        run: npm run build
+
+      - name: Guard the migration boundary
+        # The whole point of src/api is that nothing else imports the client.
+        # If this fires, a component reached past the facade.
+        run: |
+          if grep -rn "base44Client" src/ | grep -v "^src/api/"; then
+            echo "::error::A file outside src/api imports base44Client. See MIGRATION.md."
+            exit 1
+          fi
+          echo "OK: base44Client is confined to src/api"
