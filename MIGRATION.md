@@ -36,12 +36,28 @@ grep -rn "base44Client" src/ | grep -v "^src/api/"   # must return nothing
 Steps 2-6 replace the insides of those nine modules. None of them should need to
 open a component.
 
-**2. Schema.**
-Translate `base44/entities/*.jsonc` to Drizzle. Add what Base44 supplied
-implicitly: a `tenant_id` on every table, real foreign keys, and `created_date` /
-`updated_date`. Note the current schema denormalizes aggressively
-(`goal_title`, `assignee_name`, `assignee_email` are copied onto Task) — that
-was a Base44 constraint, and joins should replace it.
+**2. Schema. — WRITTEN, NOT YET DEPLOYED**
+`db/001_initial.sql` holds the eight tables, translated from
+`base44/entities/*.jsonc`. It runs green against real Postgres in
+`test/schema.test.js` (PGlite, the engine compiled to WASM), so `npm test`
+executes the DDL rather than trusting a reading of it.
+
+What changed in the translation, and why:
+
+- `tenant_id` on every table. The `rls` block in each entity file does not
+  survive the migration, so isolation becomes a column every query filters on.
+- Real foreign keys, with the cascades chosen per relationship. Deleting a goal
+  takes its tasks (which is what `goals.remove` does by hand today) but only
+  nulls the link from `agent_activity` — deleting a goal must not erase the
+  record of what the agent did about it.
+- The denormalised copies are gone. `goal_title`, `assignee_name` and
+  `assignee_email` on Task were a workaround for not being able to join, and
+  they went stale the moment anything was renamed.
+- `workspace_name` moves off the user and onto `tenants`, where it is stored
+  once instead of once per member.
+- `order` is renamed `sort_order`, since `order` is reserved in SQL.
+
+Still to do here: pick the ORM, and apply it to a real database branch.
 
 **3. Auth.**
 Magic link, session cookie, a `users` table with the `lead` / `member` role and
