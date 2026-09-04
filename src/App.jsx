@@ -8,6 +8,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 
 import AppLayout from './components/layout/AppLayout';
 import Dashboard from './pages/Dashboard';
+import Briefing from './pages/Briefing';
 import Goals from './pages/Goals';
 import GoalDetail from './pages/GoalDetail';
 import MyTasks from './pages/MyTasks';
@@ -42,6 +43,7 @@ const AuthenticatedApp = () => {
       <Route path="/onboarding" element={<Onboarding />} />
       <Route element={<AppLayout />}>
         <Route path="/" element={<Dashboard />} />
+        <Route path="/briefing" element={<Briefing />} />
         <Route path="/goals" element={<Goals />} />
         <Route path="/goals/:id" element={<GoalDetail />} />
         <Route path="/my-tasks" element={<MyTasks />} />

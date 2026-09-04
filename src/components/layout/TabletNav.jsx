@@ -1,10 +1,11 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Target, CheckSquare, Activity, Users, Settings } from "lucide-react";
+import { LayoutDashboard, Sunrise, Target, CheckSquare, Activity, Users, Settings } from "lucide-react";
 import LogoIcon from "./LogoIcon";
 
 const ALL_NAV = [
   { path: "/",         icon: LayoutDashboard, label: "Home"     },
+  { path: "/briefing", icon: Sunrise,         label: "Briefing" },
   { path: "/goals",    icon: Target,          label: "Goals"    },
   { path: "/my-tasks", icon: CheckSquare,     label: "Tasks"    },
   { path: "/activity", icon: Activity,        label: "Activity" },

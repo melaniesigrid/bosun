@@ -24,7 +24,7 @@ import { citext } from "@electric-sql/pglite/contrib/citext";
 import { pgcrypto } from "@electric-sql/pglite/contrib/pgcrypto";
 
 import { goals, tasks, tenants, updates, users } from "../server/db/queries.js";
-import { batchByAssignee, digest, pingList, triage } from "../server/agent/followup-core.js";
+import { batchByAssignee, digest, pingList, triage } from "../src/lib/followup-core.js";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const OUT = resolve(ROOT, "demo/northbound.html");

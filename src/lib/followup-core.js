@@ -9,6 +9,10 @@
  *
  * Nothing here decides to *send*. It decides what is true. Delivery is the
  * caller's job.
+ *
+ * It lives in src/ rather than server/ because both sides need it: the UI reads
+ * it to show why a task is flagged, and the scheduler will read it to decide
+ * who to message. Being pure is what lets one module serve both.
  */
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -162,7 +166,14 @@ export function digest(buckets, { limit = 5 } = {}) {
     },
     // What the lead has to act on personally, before anything is sent.
     needsYou: buckets.needs_lead.slice(0, limit),
-    slipping: [...buckets.overdue, ...buckets.quiet].slice(0, limit),
+
+    // Slipping means a person is behind. Work with nobody on it is not slipping
+    // — nobody has it to slip — and listing it in both places reads as two
+    // problems when it is one.
+    slipping: [...buckets.overdue, ...buckets.quiet]
+      .filter((t) => t.task.assignee_id)
+      .slice(0, limit),
+
     unassigned: [...buckets.overdue, ...buckets.quiet, ...buckets.due_soon, ...buckets.ok]
       .filter((t) => !t.task.assignee_id)
       .slice(0, limit),

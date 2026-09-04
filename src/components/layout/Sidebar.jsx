@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
 import LogoIcon from "./LogoIcon";
 import { Link, useLocation } from "react-router-dom";
-import { ChevronRight, LayoutDashboard, Target, CheckSquare, Activity, Users, Settings } from "lucide-react";
+import { ChevronRight, LayoutDashboard, Target, CheckSquare, Activity, Users, Settings, Sunrise } from "lucide-react";
 import * as taskApi from "@/api/tasks";
 import { useQuery } from "@tanstack/react-query";
 
 const WORKSPACE_NAV = [
   { path: "/",         icon: LayoutDashboard, label: "Dashboard"      },
+  { path: "/briefing", icon: Sunrise,        label: "Briefing"       },
   { path: "/goals",    icon: Target,          label: "Goals"          },
   { path: "/my-tasks", icon: CheckSquare,     label: "My Tasks"       },
 ];

@@ -37,7 +37,9 @@ npm run dev
 ```
 
 ```bash
-npm test         # planner logic — no install or backend needed
+npm test         # 103 tests — no install, backend or browser needed
+npm run demo     # the follow-up rule over a seeded portfolio, in a browser
+npm run dev      # then /preview.html to look at components without a backend
 npm run build
 npm run lint
 ```

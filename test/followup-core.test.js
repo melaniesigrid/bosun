@@ -13,7 +13,7 @@ import {
   shouldPing,
   triage,
   withinWorkingHours,
-} from "../server/agent/followup-core.js";
+} from "../src/lib/followup-core.js";
 
 /** A fixed Tuesday, 10:00 local — inside default working hours. */
 const NOW = new Date(2026, 8, 8, 10, 0, 0);
@@ -214,6 +214,13 @@ describe("triage", () => {
 
     it("names work nobody owns", () => {
       assert.deepEqual(d.unassigned.map((t) => t.task.id), ["nobody"]);
+    });
+
+    it("does not also file unowned work under slipping", () => {
+      // It appeared in both panels, which reads as two problems when it is one.
+      // "late" and "silent" both have an assignee and stay. "nobody" does not
+      // and moves to the unassigned panel only.
+      assert.deepEqual(d.slipping.map((t) => t.task.id), ["late", "silent"]);
     });
   });
 });

@@ -1,17 +1,18 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Target, CheckSquare, Activity, Users, Settings, Menu, X, ListTodo } from "lucide-react";
+import { LayoutDashboard, Sunrise, Target, CheckSquare, Activity, Users, Settings, Menu, X, ListTodo } from "lucide-react";
 import LogoIcon from "./LogoIcon";
 
 const BOTTOM_NAV = [
   { path: "/",         icon: LayoutDashboard, label: "Home"  },
   { path: "/goals",    icon: Target,          label: "Goals" },
   { path: "/my-tasks", icon: CheckSquare,     label: "My Tasks" },
-  { path: "/activity", icon: Activity,        label: "Agent" },
+  { path: "/briefing", icon: Sunrise,        label: "Briefing" },
 ];
 
 const DRAWER_NAV = [
   { path: "/tasks",    icon: ListTodo, label: "Tasks"    },
+  { path: "/activity", icon: Activity, label: "Agent"    },
   { path: "/team",     icon: Users,    label: "Team"     },
   { path: "/settings", icon: Settings, label: "Settings" },
 ];

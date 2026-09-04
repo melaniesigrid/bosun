@@ -19,6 +19,15 @@ npm run build
 
 `npm test` needs no database, no container and no credentials. Use it.
 
+**To look at a component**, `npm run dev` and open `/preview.html`. The app
+itself cannot run without a backend, so this is the only way to see UI. Add a
+fixture case in `src/preview.jsx`; nothing there is imported by the app.
+
+**To see the product working on real data**, `npm run demo` — it boots Postgres
+in-process, applies the schema, seeds the Northbound portfolio and runs the
+follow-up rule. Output lands in `demo/`, which is gitignored and must never be
+copied into `site/`.
+
 ## The two things most likely to trip you
 
 **The follow-up loop does not exist.** Nothing writes a `Ping`. There is no
@@ -42,6 +51,8 @@ component. Do not reach past it for convenience.
 | Path | What it is |
 | --- | --- |
 | `src/pages`, `src/components` | The UI. Complete, and never run against a real backend. |
+| `src/lib/followup-core.js` | The follow-up rule: who is quiet, who to nudge, what the lead sees. **Pure**, and shared by the UI and the future scheduler so they cannot disagree. |
+| `src/preview.jsx`, `preview.html` | Component preview harness. Fixtures only. |
 | `src/api/` | The facade. The only place Base44 is mentioned. |
 | `src/api/planner-core.js` | Prompts, schemas and normalisation. **Pure** — no I/O, no client, no env. Fully tested. |
 | `src/api/planner.js` | Four lines of transport over planner-core. |
