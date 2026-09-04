@@ -41,11 +41,12 @@ Everything below is ordered around that.
 | `server/db/queries.js` | Every read/write, tenant-scoped, 24 tests. |
 | HTTP layer | **Does not exist.** |
 | Auth | **Does not exist.** Base44 supplies it today. |
-| The follow-up rule | Written and tested. `server/agent/followup-core.js`. |
+| The follow-up rule | Written and tested. `src/lib/followup-core.js`. |
+| The Briefing page | Live at `/briefing`. Shows the triage and the drafts. |
 | Sending a nudge | **Still nothing sends.** No scheduler, no `Ping` rows. |
 | Deployed app | Nowhere. Base44 is still the only thing that can run it. |
 | Landing page | Live: <https://melaniesigrid.github.io/bosun/> |
-| Tests | 102, all green, ~12s, no server needed. |
+| Tests | 103, all green, ~12s, no server needed. |
 | Name | Not trademark-checked. No domain owned. |
 | Price | Not set. |
 | Paying customers | 0. Design partners: 0. |
@@ -56,6 +57,9 @@ Everything below is ordered around that.
 
 These are yours. Everything in Phase 1+ waits on D1; the rest can be decided in
 parallel.
+
+The whole backlog is on GitHub now — five milestones, one per phase, and every
+item below has an issue. <https://github.com/melaniesigrid/bosun/issues>
 
 - [ ] **D1 — Server shape.** Node API beside the Vite app (ZipQuarry's pattern;
       keeps all 4,000 lines of routing untouched) vs. move to Next.js
@@ -99,8 +103,11 @@ validate the idea fastest — it can be built against Base44 as it stands.
       within the assignee's `ping_frequency` budget; overdue outranks quiet; a
       task the assignee reported blocked escalates to the lead instead of being
       chased. 45 tests.
-- [ ] **The job that runs it.** The rule is pure and takes `now`; nothing calls
-      it on a schedule yet. Needs D1.
+- [ ] **The job that runs it** (#8). The rule is pure and takes `now`; nothing
+      calls it on a schedule yet. Needs D1.
+- [x] **Show it in the app** (#7). `/briefing` — Needs you, Slipping, Nobody
+      owns this, each row saying why, plus the drafts Bosun would send. Uses the
+      same rule the scheduler will, so they cannot drift apart.
 - [x] **Respect working hours and tone.** `withinWorkingHours` and
       `nextSendTime` hold a 03:00 nudge until the window opens, and treat a
       window crossing midnight as a night shift rather than one that never
@@ -120,8 +127,8 @@ validate the idea fastest — it can be built against Base44 as it stands.
       claim is that nothing happens off the record.
 - [x] **The digest, as data.** `digest()` returns counts plus what needs the
       lead, what is slipping, and what nobody owns. `npm run demo` renders it.
-- [ ] **The digest, delivered.** Emitting `digest_created` and sending it needs
-      the scheduler.
+- [ ] **The digest, delivered** (#11). Emitting `digest_created` and sending it
+      needs the scheduler.
 - [ ] `workload_balanced` — the landing page shows it. Either build it or cut it
       from the page.
 - [x] Tests for the quiet-detection rule and the ping copy. 102 tests total.
@@ -267,11 +274,26 @@ Do not launch until every line is true:
 
 ---
 
+## Seeing it without a backend
+
+Two things exist now that did not, and both work with no database and no
+credentials:
+
+- `npm run dev`, then `/preview.html` — component fixtures through the real
+  rule. The app cannot run without a backend, so this is the only way to look at
+  UI. It caught two real UX bugs the first time it was pointed at anything.
+- `npm run demo` — the whole rule over a seeded Northbound portfolio, rendered.
+  Output stays in `demo/` and must never be copied into `site/`.
+
+---
+
 ## Working agreements
 
 - `main` is green. CI runs tests, lint, build, and guards the
   `src/api` boundary.
 - Anything that changes a component and a query in the same commit is probably
   two commits.
-- New pure logic gets a test in `test/`. The four bugs found in the last session
-  were all found by tests, not by reading.
+- New pure logic gets a test in `test/`. Every bug found in the last three
+  sessions was found by a test or by looking at the rendered output — none by
+  reading the code.
+- Work goes through a PR. `main` stays green.
