@@ -41,10 +41,11 @@ Everything below is ordered around that.
 | `server/db/queries.js` | Every read/write, tenant-scoped, 24 tests. |
 | HTTP layer | **Does not exist.** |
 | Auth | **Does not exist.** Base44 supplies it today. |
-| The follow-up loop | **Does not exist.** See above. |
+| The follow-up rule | Written and tested. `server/agent/followup-core.js`. |
+| Sending a nudge | **Still nothing sends.** No scheduler, no `Ping` rows. |
 | Deployed app | Nowhere. Base44 is still the only thing that can run it. |
 | Landing page | Live: <https://melaniesigrid.github.io/bosun/> |
-| Tests | 56, all green, ~10s, no server needed. |
+| Tests | 102, all green, ~12s, no server needed. |
 | Name | Not trademark-checked. No domain owned. |
 | Price | Not set. |
 | Paying customers | 0. Design partners: 0. |
@@ -94,15 +95,22 @@ parallel.
 This is the product. Do it *before* the backend migration if you want to
 validate the idea fastest — it can be built against Base44 as it stands.
 
-- [ ] **The scheduler.** A job that wakes on a cadence, finds tasks that are
-      quiet, and decides who to nudge. "Quiet" needs a definition: no `Update`
-      on a task within N days of its deadline, where N comes from the
-      assignee's `ping_frequency`. Write that rule down before coding it.
-- [ ] **Respect working hours and tone.** `users.working_hours_start/end` and
-      `ai_tone` already exist in the schema and in Settings, and nothing reads
-      them. A nudge that arrives at 03:00 is worse than no product.
-- [ ] **Write the ping.** A `planner-core`-style pure function: task + history +
-      tone in, message out. Pure, so it is testable the way the planner is.
+- [x] **The rule.** `server/agent/followup-core.js`. Quiet means no `Update`
+      within the assignee's `ping_frequency` budget; overdue outranks quiet; a
+      task the assignee reported blocked escalates to the lead instead of being
+      chased. 45 tests.
+- [ ] **The job that runs it.** The rule is pure and takes `now`; nothing calls
+      it on a schedule yet. Needs D1.
+- [x] **Respect working hours and tone.** `withinWorkingHours` and
+      `nextSendTime` hold a 03:00 nudge until the window opens, and treat a
+      window crossing midnight as a night shift rather than one that never
+      sends. Tone drives the copy.
+- [x] **Write the ping.** `pingMessage`, plus `batchByAssignee` — one message
+      per person, not one per task. Running the rule over the real portfolio
+      produced 13 separate nudges to one inbox, which is spam, not follow-up.
+      Deterministic templates rather than a model call: a nudge is short and
+      formulaic, costs money per send, and a bad generation is rude to a
+      colleague.
 - [ ] **Deliver it.** Channel is undecided and the `Ping` entity is deliberately
       channel-agnostic. Email is the honest default; Slack is the one people
       will ask for. Pick one for v1.
@@ -110,16 +118,19 @@ validate the idea fastest — it can be built against Base44 as it stands.
       `StatusUpdateForm` already writes them. Wire the reply path to it.
 - [ ] **Emit the missing audit actions.** `ping_sent` at minimum. The product's
       claim is that nothing happens off the record.
-- [ ] **The digest.** `digest_created` — the lead's morning summary of what
-      moved and what went quiet. This is the artifact that makes someone open
-      the app daily. Arguably the real retention hook.
+- [x] **The digest, as data.** `digest()` returns counts plus what needs the
+      lead, what is slipping, and what nobody owns. `npm run demo` renders it.
+- [ ] **The digest, delivered.** Emitting `digest_created` and sending it needs
+      the scheduler.
 - [ ] `workload_balanced` — the landing page shows it. Either build it or cut it
       from the page.
-- [ ] Tests for the quiet-detection rule and the ping copy, in the pure style of
-      `test/planner-core.test.js`.
+- [x] Tests for the quiet-detection rule and the ping copy. 102 tests total.
 
 **Gate:** you can create a goal, walk away for three days, and receive a nudge
-you did not trigger. Until that works there is nothing to sell.
+you did not trigger. Until that works there is nothing to sell. The rule that
+decides *what* to send is done; the part that *sends* is not.
+
+See it on the real portfolio without any backend: `npm run demo`.
 
 ---
 
