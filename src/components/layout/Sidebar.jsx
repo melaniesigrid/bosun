@@ -185,7 +185,7 @@ export default function Sidebar({ collapsed, onToggle }) {
               textTransform: 'uppercase',
               lineHeight: 1,
             }}>
-              ORBITAL
+              BOSUN
             </span>
           )}
         </Link>

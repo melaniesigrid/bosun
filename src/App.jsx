@@ -9,6 +9,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import AppLayout from './components/layout/AppLayout';
 import Dashboard from './pages/Dashboard';
 import Briefing from './pages/Briefing';
+import Login from './pages/Login';
 import Goals from './pages/Goals';
 import GoalDetail from './pages/GoalDetail';
 import MyTasks from './pages/MyTasks';
@@ -29,6 +30,15 @@ const AuthenticatedApp = () => {
     );
   }
 
+  // Without this, arriving at /login while signed out redirects to /login.
+  if (window.location.pathname === '/login') {
+    return (
+      <Routes>
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    );
+  }
+
   if (authError) {
     if (authError.type === 'user_not_registered') {
       return <UserNotRegisteredError />;
@@ -40,6 +50,8 @@ const AuthenticatedApp = () => {
 
   return (
     <Routes>
+      {/* Reachable while signed out — it is how you stop being signed out. */}
+      <Route path="/login" element={<Login />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route element={<AppLayout />}>
         <Route path="/" element={<Dashboard />} />

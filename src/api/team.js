@@ -1,14 +1,13 @@
-import { base44 } from "./base44Client";
+import { del, get, post } from "./http";
 
 /** Workspace members. */
 
-export const listMembers = () => base44.entities.User.list();
+export const listMembers = () => get("/team");
 
 /**
- * Bosun's roles are "lead" and "member". The backend's are "admin" and "user".
- * The translation is kept here so no page has to know both vocabularies.
+ * Bosun's roles are "lead" and "member" throughout now — the admin/user
+ * translation the Base44 client needed is gone with it.
  */
-export const invite = (email, role = "member") =>
-  base44.users.inviteUser(email, role === "lead" ? "admin" : "user");
+export const invite = (email, role = "member") => post("/team", { email, role });
 
-export const removeMember = (id) => base44.entities.User.delete(id);
+export const removeMember = (id) => del(`/team/${id}`);

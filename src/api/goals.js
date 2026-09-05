@@ -1,34 +1,22 @@
-import { base44 } from "./base44Client";
-import * as tasks from "./tasks";
+import { del, get, patch, post } from "./http";
 
 /** Goals: an objective, its clarifying context, and the tasks it owns. */
 
-const RECENT = "-created_date";
+export const list = (limit = 50) => get("/goals", { limit });
 
-export const list = (limit = 50) => base44.entities.Goal.list(RECENT, limit);
+export const getOne = (id) => get(`/goals/${id}`);
+export { getOne as get };
 
-/**
- * There is no fetch-by-id on the entity API, so callers were filtering and
- * taking the first row by hand. That belongs here rather than in five pages.
- */
-export async function get(id) {
-  const [goal] = await base44.entities.Goal.filter({ id });
-  return goal ?? null;
-}
+export const create = (goal) => post("/goals", goal);
 
-export const create = (goal) => base44.entities.Goal.create(goal);
-
-export const update = (id, patch) => base44.entities.Goal.update(id, patch);
+export const update = (id, body) => patch(`/goals/${id}`, body);
 
 export const activate = (id) => update(id, { status: "active" });
 
 export const complete = (id) => update(id, { status: "completed" });
 
 /**
- * A goal owns its tasks. Deleting one without the other strands rows that
- * nothing can reach, so the cascade lives here and callers cannot forget it.
+ * The tasks go with it. That is the schema's cascade now, not a second request
+ * the caller has to remember.
  */
-export async function remove(id) {
-  await tasks.removeForGoal(id);
-  return base44.entities.Goal.delete(id);
-}
+export const remove = (id) => del(`/goals/${id}`);

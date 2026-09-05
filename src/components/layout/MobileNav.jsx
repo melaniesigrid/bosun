@@ -116,7 +116,7 @@ export default function MobileNav() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <LogoIcon size={9} />
             <span style={{ fontFamily: "'Archivo', sans-serif", fontSize: 12, fontWeight: 600, letterSpacing: '0.18em', color: '#2f2823', textTransform: 'uppercase' }}>
-              ORBITAL
+              BOSUN
             </span>
           </div>
           <button

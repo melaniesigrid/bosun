@@ -21,11 +21,10 @@ Three of the eight `agent_action` values are ever produced — `goal_analyzed`,
 `digest_created`, `workload_balanced`, `task_assigned`, `clarification_asked`)
 exist in the schema and in the UI's vocabulary, and nothing emits them.
 
-So what exists today is a goal-to-task generator with a nice activity log. The
-*following up* — the half that is not Asana, the half the name is about — is
-not built. The live landing page already promises it: "It follows up without
-you." That sentence is currently marketing ahead of the product, and it is the
-first thing to either make true or take down.
+So what exists today is a board, a briefing that knows exactly who has gone
+quiet, and an activity log. The *following up* — the half the name is about —
+is still not built: nothing sends. The landing page leads with the board, which
+is the honest thing to lead with while that is true.
 
 Everything below is ordered around that.
 
@@ -39,14 +38,18 @@ Everything below is ordered around that.
 | `src/api/` facade | Done. 69 call sites, CI guards the boundary. |
 | `db/001_initial.sql` | 8 tables, executed against real Postgres in CI. |
 | `server/db/queries.js` | Every read/write, tenant-scoped, 24 tests. |
-| HTTP layer | **Does not exist.** |
-| Auth | **Does not exist.** Base44 supplies it today. |
+| HTTP layer | `server/http/` — every route, tenant from the session only. |
+| Auth | Session cookie. Dev sign-in works; magic links are #14. |
 | The follow-up rule | Written and tested. `src/lib/followup-core.js`. |
 | The Briefing page | Live at `/briefing`. Shows the triage and the drafts. |
+| The board | Live at `/tasks`. Five columns, drag writes status and sort_order. |
+| Base44 | **Gone.** SDK, plugin, entity files and app-params all removed. |
+| The model calls | Answer 501. The last piece of the migration — #16. |
 | Sending a nudge | **Still nothing sends.** No scheduler, no `Ping` rows. |
-| Deployed app | Nowhere. Base44 is still the only thing that can run it. |
+| Runs locally | Yes. `npm run seed && npm run api && npm run dev`. |
+| Deployed app | Nowhere yet. It no longer needs Base44 to run. |
 | Landing page | Live: <https://melaniesigrid.github.io/bosun/> |
-| Tests | 103, all green, ~12s, no server needed. |
+| Tests | 128, all green, no server needed. |
 | Name | Not trademark-checked. No domain owned. |
 | Price | Not set. |
 | Paying customers | 0. Design partners: 0. |
@@ -61,13 +64,12 @@ parallel.
 The whole backlog is on GitHub now — five milestones, one per phase, and every
 item below has an issue. <https://github.com/melaniesigrid/bosun/issues>
 
-- [ ] **D1 — Server shape.** Node API beside the Vite app (ZipQuarry's pattern;
-      keeps all 4,000 lines of routing untouched) vs. move to Next.js
-      (Shipshape/Quotefront/ReconAI's pattern; means rewriting react-router).
-      *Recommendation: Node API.* The UI is finished and working; rewriting its
-      routing buys consistency with three siblings and costs a week that should
-      go into the follow-up loop. `server/db/queries.js` was deliberately
-      written to work under either.
+- [x] **D1 — Server shape. Settled: a Node API beside the Vite app.** Express
+      over `server/db/queries.js`, Vite proxying `/api`. The alternative was
+      moving to Next.js for consistency with Shipshape, Quotefront and ReconAI;
+      it was not worth a week of rewriting react-router when the UI already
+      worked. Reversible: nothing in `server/` knows it is Express except
+      `server/http/app.js`.
 - [ ] **D2 — Name.** "Bosun" is unverified. Check USPTO + CIPO, and domain
       availability, before it goes on anything harder to change than a repo.
       Budget: one hour. Do it before D3.
@@ -143,29 +145,30 @@ See it on the real portfolio without any backend: `npm run demo`.
 
 ## Phase 2 — Own the backend (MIGRATION.md steps 3–6)
 
-- [ ] **D1 first.** Nothing here starts until the server shape is chosen.
-- [ ] Stand up the HTTP layer over `server/db/queries.js`. Every handler
-      resolves `tenantId` from the session and passes it explicitly; no handler
-      may read it from the request body.
-- [ ] Auth: magic link, session cookie, the `lead`/`member` roles and the
-      `onboarded` flag the onboarding route already reads. `AuthContext.jsx`
-      models `user_not_registered` and `auth_required` as distinct states —
-      keep both.
-- [ ] Point `src/api/` at the new API instead of Base44. This is the payoff for
-      the facade: nine files change, no component does.
-- [ ] Move `InvokeLLM` server-side. `planner-core.js` moves unchanged; only the
-      four lines of transport in `planner.js` are rewritten.
+- [x] **D1 settled.** Node API beside Vite.
+- [x] **The HTTP layer** (#13). `server/http/app.js` over the query layer. The
+      tenant comes from the session and nowhere else; no handler reads one from
+      a body. Tested by asking for another workspace's rows by id.
+- [x] **Sessions** (#14, partly). Signed HttpOnly cookie, `lead`/`member` roles
+      enforced on the team routes, `user_not_registered` and `auth_required`
+      kept distinct. **Magic links are still to do** — sign-in today is a
+      development-only endpoint that refuses to run in production.
+- [x] **Point `src/api/` at the new API** (#15). Nine files changed. No
+      component did, which is the whole return on building the facade first.
+- [ ] Move `InvokeLLM` server-side (#16). `planner-core.js` moves unchanged;
+      only the four lines of transport in `planner.js` are rewritten. The route
+      answers 501 until then, so goal creation is the one broken flow.
 - [ ] Per-tenant token caps and a cost ceiling. An unbounded LLM bill on a free
       trial is a real way to lose money on a product with no revenue.
 - [ ] Neon branch, migrations wired to CI, seed script.
-- [ ] Delete `@base44/sdk`, `@base44/vite-plugin`, `src/lib/app-params.js` and
-      `base44/`. **Delete `app-params.js` deliberately** — it reads an access
-      token from the URL query string into `localStorage`, and that must not
-      survive.
+- [x] **Delete Base44** (#17). The SDK, the Vite plugin, `base44/` and
+      `src/lib/app-params.js` are all gone. `app-params.js` mattered most: it
+      read an access token out of the URL query string into `localStorage`.
 - [ ] Deploy. Vercel. Note the workspace trap: Vercel is not git-connected here,
       `vercel deploy --prod` ships the *directory*, so land to `main` first.
 
-**Gate:** the app runs end to end with no Base44 credentials anywhere.
+**Gate:** the app runs end to end with no Base44 credentials anywhere. **Met**,
+with one hole: creating a goal calls the planner, which answers 501.
 
 ---
 
@@ -197,11 +200,13 @@ Nothing here is optional once someone who is not you has an account.
 
 ## Phase 4 — Go to market
 
-- [ ] **Sharpen the position.** "The AI chief of staff that chases people so you
-      do not have to." The competition (Asana, Linear, Motion, Height) all sell
-      a *place to put work*. Bosun sells the thing nobody does: the follow-up.
-      Never lead with the board — it is the weakest thing here and the page
-      already says so.
+- [x] **The position.** "The board that chases people." The competition (Asana,
+      Linear, Motion, Height) all sell a place to put work; Bosun sells the
+      board *plus* the thing none of them do. Leading with the board is also the
+      honest order while nothing sends.
+      **Watch the Shipshape overlap** — that product is also described as
+      "kanban boards plus readiness rubrics". The boundary is now scope:
+      Shipshape looks across a portfolio, Bosun looks inside one team.
 - [ ] **Name the buyer.** Best guess: a lead of 3–15 people who does not have a
       project manager and is personally the bottleneck on chasing. Agencies,
       small studios, ops teams. Not enterprise, not solo.
@@ -252,8 +257,8 @@ Do not launch until every line is true:
 
 - A mobile app.
 - Integrations beyond the one chosen delivery channel.
-- Gantt charts, time tracking, sprints, story points. Every one of them makes
-  Bosun a worse Asana instead of the only thing that follows up.
+- Gantt charts, time tracking, sprints, story points. The board earns its place
+  because the cards are people with deadlines; those four make it a worse Asana.
 - Multi-language.
 - Self-hosting.
 

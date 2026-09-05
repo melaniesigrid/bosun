@@ -1,5 +1,33 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+
+/**
+ * Which layout to render.
+ *
+ * All three used to render at once, hidden from each other with Tailwind's
+ * responsive classes — so every page mounted three times and every effect,
+ * timer and query inside it ran three times. Choosing in JS renders one.
+ */
+const QUERIES = { desktop: "(min-width: 1024px)", tablet: "(min-width: 768px)" };
+
+function useLayoutSize() {
+  const read = () => {
+    if (typeof window === "undefined" || !window.matchMedia) return "desktop";
+    if (window.matchMedia(QUERIES.desktop).matches) return "desktop";
+    if (window.matchMedia(QUERIES.tablet).matches) return "tablet";
+    return "mobile";
+  };
+  // Read during the first render, so the correct layout is the first one painted.
+  const [size, setSize] = React.useState(read);
+  React.useEffect(() => {
+    const onChange = () => setSize(read());
+    const lists = Object.values(QUERIES).map((q) => window.matchMedia(q));
+    lists.forEach((l) => l.addEventListener("change", onChange));
+    onChange();
+    return () => lists.forEach((l) => l.removeEventListener("change", onChange));
+  }, []);
+  return size;
+}
 import Sidebar from "./Sidebar";
 import TabletNav from "./TabletNav";
 import MobileNav from "./MobileNav";
@@ -62,11 +90,14 @@ export default function AppLayout() {
     };
   }, []);
 
+  const layout = useLayoutSize();
+
   return (
     <>
       {/* ── Desktop layout (≥1024px) ── */}
+      {layout === "desktop" && (
       <div
-        className="hidden lg:flex h-screen"
+        className="flex h-screen"
         style={{ background: '#ebe7e2', padding: '24px', gap: '24px', position: 'relative', overflow: 'hidden' }}
       >
         <div ref={glowDesktopRef} style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, transition: 'none' }} />
@@ -75,10 +106,12 @@ export default function AppLayout() {
           <Outlet />
         </main>
       </div>
+      )}
 
       {/* ── Tablet layout (768px – 1023px) ── */}
+      {layout === "tablet" && (
       <div
-        className="hidden md:block lg:hidden"
+        className="block"
         style={{ background: '#ebe7e2', position: 'relative' }}
       >
         <div ref={glowTabletRef} style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, transition: 'none' }} />
@@ -115,10 +148,12 @@ export default function AppLayout() {
         </main>
         <TabletNav />
       </div>
+      )}
 
       {/* ── Mobile layout (<768px) ── */}
+      {layout === "mobile" && (
       <div
-        className="flex md:hidden flex-col"
+        className="flex flex-col"
         style={{ background: '#ebe7e2', minHeight: '100dvh', position: 'relative', overflow: 'hidden' }}
       >
         <div ref={glowMobileRef} style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 0, transition: 'none' }} />
@@ -145,7 +180,7 @@ export default function AppLayout() {
               color: '#2f2823',
               textTransform: 'uppercase',
             }}>
-              ORBITAL
+              BOSUN
             </span>
           </div>
           {user ? (
@@ -219,6 +254,7 @@ export default function AppLayout() {
         </main>
         <MobileNav />
       </div>
+      )}
     </>
   );
 }

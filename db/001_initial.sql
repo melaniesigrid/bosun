@@ -72,7 +72,12 @@ CREATE TABLE users (
 
   -- One account per address per workspace. Not globally unique: the same person
   -- may belong to two workspaces.
-  UNIQUE (tenant_id, email)
+  UNIQUE (tenant_id, email),
+
+  -- Lets every other table point at a user *within a tenant*. See the note on
+  -- tasks: a plain REFERENCES users(id) would let one workspace's row reference
+  -- another workspace's person.
+  UNIQUE (tenant_id, id)
 );
 CREATE INDEX users_tenant_idx ON users (tenant_id);
 
@@ -82,7 +87,7 @@ CREATE TABLE goals (
   tenant_id   uuid NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
   title       text NOT NULL,
   description text NOT NULL DEFAULT '',
-  owner_id    uuid REFERENCES users(id) ON DELETE SET NULL,
+  owner_id    uuid,
   status      goal_status NOT NULL DEFAULT 'draft',
   target_date date,
 
@@ -92,7 +97,11 @@ CREATE TABLE goals (
   ai_context  text NOT NULL DEFAULT '',
 
   created_at  timestamptz NOT NULL DEFAULT now(),
-  updated_at  timestamptz NOT NULL DEFAULT now()
+  updated_at  timestamptz NOT NULL DEFAULT now(),
+
+  UNIQUE (tenant_id, id),
+  FOREIGN KEY (tenant_id, owner_id) REFERENCES users (tenant_id, id)
+    ON DELETE SET NULL (owner_id)
 );
 CREATE INDEX goals_tenant_created_idx ON goals (tenant_id, created_at DESC);
 CREATE INDEX goals_owner_idx ON goals (owner_id);
@@ -104,14 +113,20 @@ CREATE TABLE tasks (
 
   -- A goal owns its tasks. The cascade lives here so the application cannot
   -- forget it; src/api/goals.js does this by hand today.
-  goal_id   uuid NOT NULL REFERENCES goals(id) ON DELETE CASCADE,
+  --
+  -- The reference is composite, on (tenant_id, goal_id) rather than goal_id
+  -- alone. A plain REFERENCES goals(id) is satisfied by *any* goal, so a task
+  -- in one workspace could be pointed at another workspace's goal — and since
+  -- tasks are read with the goal title joined on, that is a cross-tenant read.
+  -- An HTTP test caught exactly that, with a 200.
+  goal_id   uuid NOT NULL,
 
   title       text NOT NULL,
   description text NOT NULL DEFAULT '',
 
   -- Nullable on purpose: a task with nobody on it is exactly the state Bosun
   -- exists to make visible.
-  assignee_id uuid REFERENCES users(id) ON DELETE SET NULL,
+  assignee_id uuid,
 
   deadline date,
   status   task_status NOT NULL DEFAULT 'pending',
@@ -125,7 +140,12 @@ CREATE TABLE tasks (
   sort_order    integer NOT NULL DEFAULT 0,  -- "order" is reserved in SQL
 
   created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now()
+  updated_at timestamptz NOT NULL DEFAULT now(),
+
+  UNIQUE (tenant_id, id),
+  FOREIGN KEY (tenant_id, goal_id) REFERENCES goals (tenant_id, id) ON DELETE CASCADE,
+  FOREIGN KEY (tenant_id, assignee_id) REFERENCES users (tenant_id, id)
+    ON DELETE SET NULL (assignee_id)
 );
 CREATE INDEX tasks_goal_order_idx ON tasks (goal_id, sort_order);
 CREATE INDEX tasks_assignee_status_idx ON tasks (assignee_id, status);
@@ -135,11 +155,15 @@ CREATE INDEX tasks_tenant_created_idx ON tasks (tenant_id, created_at DESC);
 CREATE TABLE updates (
   id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id  uuid NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  task_id    uuid NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
-  user_id    uuid REFERENCES users(id) ON DELETE SET NULL,
+  task_id    uuid NOT NULL,
+  user_id    uuid,
   status     update_status NOT NULL,
   message    text NOT NULL DEFAULT '',
-  created_at timestamptz NOT NULL DEFAULT now()
+  created_at timestamptz NOT NULL DEFAULT now(),
+
+  FOREIGN KEY (tenant_id, task_id) REFERENCES tasks (tenant_id, id) ON DELETE CASCADE,
+  FOREIGN KEY (tenant_id, user_id) REFERENCES users (tenant_id, id)
+    ON DELETE SET NULL (user_id)
 );
 -- MyTasks reads the newest update per task; this index is that query.
 CREATE INDEX updates_task_created_idx ON updates (task_id, created_at DESC);
@@ -148,8 +172,8 @@ CREATE INDEX updates_task_created_idx ON updates (task_id, created_at DESC);
 CREATE TABLE pings (
   id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   tenant_id    uuid NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
-  task_id      uuid NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
-  assignee_id  uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  task_id      uuid NOT NULL,
+  assignee_id  uuid NOT NULL,
   message      text NOT NULL DEFAULT '',
   status       ping_status NOT NULL DEFAULT 'sent',
   response     text,
@@ -159,7 +183,10 @@ CREATE TABLE pings (
   -- A ping is answered or it is not. It cannot be both.
   CONSTRAINT ping_response_consistent CHECK (
     (status = 'responded') = (responded_at IS NOT NULL)
-  )
+  ),
+
+  FOREIGN KEY (tenant_id, task_id) REFERENCES tasks (tenant_id, id) ON DELETE CASCADE,
+  FOREIGN KEY (tenant_id, assignee_id) REFERENCES users (tenant_id, id) ON DELETE CASCADE
 );
 -- pings.listOpenFor: one assignee, unanswered.
 CREATE INDEX pings_open_idx ON pings (assignee_id, status);
@@ -187,12 +214,19 @@ CREATE TABLE agent_activity (
 
   -- SET NULL rather than CASCADE, deliberately: deleting a goal must not erase
   -- the record of what the agent did about it.
-  related_goal_id uuid REFERENCES goals(id) ON DELETE SET NULL,
-  related_task_id uuid REFERENCES tasks(id) ON DELETE SET NULL,
-  related_user_id uuid REFERENCES users(id) ON DELETE SET NULL,
+  related_goal_id uuid,
+  related_task_id uuid,
+  related_user_id uuid,
 
   metadata   jsonb NOT NULL DEFAULT '{}'::jsonb,
-  created_at timestamptz NOT NULL DEFAULT now()
+  created_at timestamptz NOT NULL DEFAULT now(),
+
+  FOREIGN KEY (tenant_id, related_goal_id) REFERENCES goals (tenant_id, id)
+    ON DELETE SET NULL (related_goal_id),
+  FOREIGN KEY (tenant_id, related_task_id) REFERENCES tasks (tenant_id, id)
+    ON DELETE SET NULL (related_task_id),
+  FOREIGN KEY (tenant_id, related_user_id) REFERENCES users (tenant_id, id)
+    ON DELETE SET NULL (related_user_id)
 );
 CREATE INDEX agent_activity_tenant_created_idx ON agent_activity (tenant_id, created_at DESC);
 
