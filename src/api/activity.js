@@ -1,4 +1,4 @@
-import { base44 } from "./base44Client";
+import { get, post } from "./http";
 
 /**
  * The agent's audit log.
@@ -7,7 +7,6 @@ import { base44 } from "./base44Client";
  * recoverable afterwards. This module is the only way to write that record.
  */
 
-export const listRecent = (limit = 100) =>
-  base44.entities.AgentActivity.list("-created_date", limit);
+export const listRecent = (limit = 100) => get("/activity", { limit });
 
-export const log = (entry) => base44.entities.AgentActivity.create(entry);
+export const log = (entry) => post("/activity", entry);

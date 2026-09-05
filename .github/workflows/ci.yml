@@ -35,12 +35,21 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Guard the migration boundary
-        # The whole point of src/api is that nothing else imports the client.
-        # If this fires, a component reached past the facade.
+      - name: Guard the API boundary
+        # src/api exists so that nothing else knows how the backend is reached.
+        # If this fires, a component reached past the facade and called fetch
+        # itself — which is how the Base44 migration became a 69-site rewrite.
         run: |
-          if grep -rn "base44Client" src/ | grep -v "^src/api/"; then
-            echo "::error::A file outside src/api imports base44Client. See MIGRATION.md."
+          if grep -rn "api/http" src/ | grep -v "^src/api/"; then
+            echo "::error::A file outside src/api imports the HTTP transport."
             exit 1
           fi
-          echo "OK: base44Client is confined to src/api"
+          echo "OK: the transport is confined to src/api"
+
+      - name: Guard against Base44 coming back
+        run: |
+          if grep -rn "@base44\|base44Client\|app-params" src/ server/ scripts/ 2>/dev/null; then
+            echo "::error::Base44 was removed in Phase 2. Nothing should reference it."
+            exit 1
+          fi
+          echo "OK: no Base44 references"

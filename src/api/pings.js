@@ -1,7 +1,11 @@
-import { base44 } from "./base44Client";
+import { get, post } from "./http";
 
 /** Outbound nudges to an assignee, and their replies. */
 
-/** Pings this person has been sent but has not answered yet. */
-export const listOpenFor = (assigneeId) =>
-  base44.entities.Ping.filter({ assignee_id: assigneeId, status: "sent" });
+/**
+ * Pings sent to the signed-in person and not yet answered. The assignee is the
+ * session, so this takes no argument — a caller cannot ask for someone else's.
+ */
+export const listOpenFor = () => get("/pings");
+
+export const recordResponse = (id, response) => post(`/pings/${id}/response`, { response });

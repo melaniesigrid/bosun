@@ -45,7 +45,7 @@ export default function TabletNav() {
           textTransform: 'uppercase',
           lineHeight: 1,
         }}>
-          ORBITAL
+          BOSUN
         </span>
       </div>
 

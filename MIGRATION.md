@@ -1,7 +1,12 @@
-# Migrating off Base44
+# Migrating off Base44 — done, except the model calls
 
-Base44 is not a framework in this codebase. It is the entire backend. Removing
-it means writing one, not swapping an import.
+Base44 is not a framework in this codebase. It was the entire backend. Removing
+it meant writing one, not swapping an import.
+
+**Status: the app runs with no Base44 anywhere.** Its own API serves it, its own
+session authenticates it, and `@base44/sdk`, `@base44/vite-plugin`, `base44/`
+and `src/lib/app-params.js` are gone from the tree. The one piece outstanding is
+the two model calls, which answer 501 — see step 5.
 
 ## What Base44 currently provides
 

@@ -1,20 +1,28 @@
-import base44 from "@base44/vite-plugin"
+import { fileURLToPath, URL } from 'node:url'
+
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
   logLevel: 'error', // Suppress warnings, only show errors
-  plugins: [
-    base44({
-      // Support for legacy code that imports the base44 SDK with @/integrations, @/entities, etc.
-      // can be removed if the code has been updated to use the new SDK imports from @base44/sdk
-      legacySDKImports: process.env.BASE44_LEGACY_SDK_IMPORTS === 'true',
-      hmrNotifier: true,
-      navigationNotifier: true,
-      analyticsTracker: true,
-      visualEditAgent: true
-    }),
-    react(),
-  ]
+  plugins: [react()],
+
+  // The Base44 plugin used to supply this alias. Removing the plugin removed
+  // it, and every "@/..." import in the app broke at once.
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
+  server: {
+    // The app and the API are one origin in the browser, so the session cookie
+    // is same-origin and no CORS is involved.
+    proxy: {
+      "/api": {
+        target: process.env.API_URL ?? "http://localhost:8787",
+        changeOrigin: false,
+      },
+    },
+  }
 });
