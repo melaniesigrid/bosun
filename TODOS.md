@@ -21,11 +21,10 @@ Three of the eight `agent_action` values are ever produced — `goal_analyzed`,
 `digest_created`, `workload_balanced`, `task_assigned`, `clarification_asked`)
 exist in the schema and in the UI's vocabulary, and nothing emits them.
 
-So what exists today is a goal-to-task generator with a nice activity log. The
-*following up* — the half that is not Asana, the half the name is about — is
-not built. The live landing page already promises it: "It follows up without
-you." That sentence is currently marketing ahead of the product, and it is the
-first thing to either make true or take down.
+So what exists today is a board, a briefing that knows exactly who has gone
+quiet, and an activity log. The *following up* — the half the name is about —
+is still not built: nothing sends. The landing page leads with the board, which
+is the honest thing to lead with while that is true.
 
 Everything below is ordered around that.
 
@@ -43,6 +42,7 @@ Everything below is ordered around that.
 | Auth | Session cookie. Dev sign-in works; magic links are #14. |
 | The follow-up rule | Written and tested. `src/lib/followup-core.js`. |
 | The Briefing page | Live at `/briefing`. Shows the triage and the drafts. |
+| The board | Live at `/tasks`. Five columns, drag writes status and sort_order. |
 | Base44 | **Gone.** SDK, plugin, entity files and app-params all removed. |
 | The model calls | Answer 501. The last piece of the migration — #16. |
 | Sending a nudge | **Still nothing sends.** No scheduler, no `Ping` rows. |
@@ -200,11 +200,13 @@ Nothing here is optional once someone who is not you has an account.
 
 ## Phase 4 — Go to market
 
-- [ ] **Sharpen the position.** "The AI chief of staff that chases people so you
-      do not have to." The competition (Asana, Linear, Motion, Height) all sell
-      a *place to put work*. Bosun sells the thing nobody does: the follow-up.
-      Never lead with the board — it is the weakest thing here and the page
-      already says so.
+- [x] **The position.** "The board that chases people." The competition (Asana,
+      Linear, Motion, Height) all sell a place to put work; Bosun sells the
+      board *plus* the thing none of them do. Leading with the board is also the
+      honest order while nothing sends.
+      **Watch the Shipshape overlap** — that product is also described as
+      "kanban boards plus readiness rubrics". The boundary is now scope:
+      Shipshape looks across a portfolio, Bosun looks inside one team.
 - [ ] **Name the buyer.** Best guess: a lead of 3–15 people who does not have a
       project manager and is personally the bottleneck on chasing. Agencies,
       small studios, ops teams. Not enterprise, not solo.
@@ -255,8 +257,8 @@ Do not launch until every line is true:
 
 - A mobile app.
 - Integrations beyond the one chosen delivery channel.
-- Gantt charts, time tracking, sprints, story points. Every one of them makes
-  Bosun a worse Asana instead of the only thing that follows up.
+- Gantt charts, time tracking, sprints, story points. The board earns its place
+  because the cards are people with deadlines; those four make it a worse Asana.
 - Multi-language.
 - Self-hosting.
 
