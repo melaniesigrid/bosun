@@ -4,7 +4,7 @@ import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
  * Sessions, as a signed cookie.
  *
  * The cookie carries the user id and the tenant id. Nothing above trusts a
- * tenant that arrived in a request body — the only tenant a handler may act on
+ * tenant that arrived in a request body: the only tenant a handler may act on
  * is the one in this signature. That is the whole replacement for Base44's
  * per-entity `rls` blocks.
  */
@@ -88,7 +88,7 @@ export function readCookies(req) {
 }
 
 /**
- * Attaches `req.session` when the cookie is valid. Does not reject — that is
+ * Attaches `req.session` when the cookie is valid. Does not reject. That is
  * `requireSession`'s job, so public routes can share this.
  */
 export function withSession(req, _res, next) {

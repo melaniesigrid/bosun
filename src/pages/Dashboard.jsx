@@ -281,7 +281,7 @@ export default function Dashboard() {
         </motion.div>
       )}
 
-      {/* ── Main 2-column grid — fills remaining space ── */}
+      {/* ── Main 2-column grid: fills remaining space ── */}
       {introPhase === "done" && (
         <motion.div
           className="tablet-grid"
@@ -300,7 +300,7 @@ export default function Dashboard() {
         >
           {/* TOP-LEFT: image card + progress circle side by side */}
           <div style={{ display: 'flex', gap: 16, flexDirection: 'row', height: (isMobile || isTablet) ? 'auto' : '100%', minWidth: 0 }}>
-            {/* Card 1 — background image, grows to fill */}
+            {/* Card 1: background image, grows to fill */}
             <motion.div
               className="neu-raised"
               style={{ position: 'relative', overflow: 'hidden', borderRadius: 'var(--radius-card)', flex: isMobile ? '1 1 50%' : 1, maxWidth: isMobile ? '50%' : undefined, height: isMobile ? 150 : (isTablet ? 200 : '100%'), minHeight: isMobile ? 150 : 'unset', minWidth: 0 }}
@@ -330,7 +330,7 @@ export default function Dashboard() {
               </div>
             </motion.div>
 
-            {/* Card 2 — interactive progress circle, perfect square */}
+            {/* Card 2: interactive progress circle, perfect square */}
             <motion.div
               className="neu-raised flex items-center justify-center"
               style={{ padding: '6px', cursor: 'pointer', position: 'relative', overflow: 'hidden', flex: isMobile ? '1 1 50%' : undefined, maxWidth: isMobile ? '50%' : undefined, width: isMobile ? undefined : 180, height: isMobile ? 150 : 180, flexShrink: isMobile ? 1 : 0, minWidth: 0 }}

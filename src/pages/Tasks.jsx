@@ -46,7 +46,7 @@ export default function Tasks() {
    * A drag writes only the rows board-core says actually changed.
    *
    * The board already moved the card locally, so this does not need to be
-   * optimistic — but it does need to put the truth back if a write fails, or
+   * optimistic, but it does need to put the truth back if a write fails, or
    * the card sits somewhere the database disagrees with.
    */
   const move = useMutation({

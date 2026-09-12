@@ -17,7 +17,7 @@ const actionIcons = {
   clarification_asked: HelpCircle,
 };
 
-// Flat colored circles — same palette as LiveActivityFeed on Dashboard
+// Flat colored circles: same palette as LiveActivityFeed on Dashboard
 const iconColors = {
   goal_analyzed:       '#C9B3F5',
   tasks_generated:     '#2ECC8A',
@@ -47,7 +47,7 @@ export default function ActivityItem({ activity, index, isLast }) {
       onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.35)'; }}
       onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
     >
-      {/* Flat colored circle — matches Dashboard style */}
+      {/* Flat colored circle: matches Dashboard style */}
       <div style={{
         width: 30,
         height: 30,

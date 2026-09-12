@@ -4,7 +4,7 @@ import React from "react";
  * The nudges Bosun would send, one card per person.
  *
  * Nothing here sends anything. Until the scheduler exists these are drafts, and
- * the copy says so plainly — implying a message went out when it did not is the
+ * the copy says so plainly: implying a message went out when it did not is the
  * worst available failure for a product whose entire promise is that it
  * followed up.
  */
@@ -29,7 +29,7 @@ export default function DraftMessages({ drafts }) {
 
       <p style={{ fontSize: 12.5, color: "#6e6e6e", margin: "0 0 16px", maxWidth: "62ch" }}>
         One message per person, in the tone they are set to, held until their
-        working hours. Nothing is sent yet — delivery is not built.
+        working hours. Nothing is sent yet: delivery is not built.
       </p>
 
       <div style={{ display: "grid", gap: 12 }}>

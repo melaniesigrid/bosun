@@ -11,7 +11,7 @@ import { batchByAssignee, digest, pingList, triage } from "@/lib/followup-core";
  * A component preview harness.
  *
  * The app cannot be run without a backend, which meant until now there was no
- * way to look at a component at all — UI changes were verified by `npm run
+ * way to look at a component at all: UI changes were verified by `npm run
  * build` succeeding, which proves nothing about what a person sees.
  *
  * `npm run dev` then open /preview.html. Fixtures only; nothing here is

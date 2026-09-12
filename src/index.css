@@ -16,15 +16,15 @@
     --bg-surface:     30 8% 92%;    /* #eeeae6 warm surface */
     --bg-surface-alt: 30 7% 94%;    /* #f2efeb warm alt */
 
-    /* Text — all meet 4.5:1 contrast on warm canvas */
-    --text-primary:   25 15% 16%;   /* #2e2a26 — ~9:1 */
-    --text-secondary: 25 8% 38%;    /* #665f57 — ~4.6:1 */
-    --text-muted:     25 6% 45%;    /* #7a7470 — ~4.5:1 */
+    /* Text (all meet 4.5:1 contrast on warm canvas */
+    --text-primary:   25 15% 16%;   /* #2e2a26) ~9:1 */
+    --text-secondary: 25 8% 38%;    /* #665f57 (~4.6:1 */
+    --text-muted:     25 6% 45%;    /* #7a7470) ~4.5:1 */
 
     /* Divider */
     --line:           30 10% 83%;   /* #d9d3cc */
 
-    /* Accent palette — brand palette */
+    /* Accent palette: brand palette */
     --sage:           152 63% 44%;  /* #2ECC8A green */
     --terracotta:     3 100% 73%;   /* #FF8077 orange-red */
     --blush:          340 78% 86%;  /* #F9AEBE pink */
@@ -35,7 +35,7 @@
     --lavender:       264 67% 83%;  /* #C9B3F5 lavender */
     --brown:          33 40% 57%;   /* #C4996A tan/brown */
 
-    /* Neumorphic shadows — tuned to warm canvas #ebe7e2 */
+    /* Neumorphic shadows: tuned to warm canvas #ebe7e2 */
     --shadow-out:    -8px -8px 16px rgba(255,250,244,0.78), 8px 8px 18px rgba(160,143,126,0.31);
     --shadow-out-sm: -5px -5px 10px rgba(255,250,244,0.78), 5px 5px 12px rgba(160,143,126,0.27);
     --shadow-in:     inset -4px -4px 8px rgba(255,250,244,0.68), inset 4px 4px 8px rgba(160,143,126,0.24);
@@ -237,7 +237,7 @@
   .mobile-header-hide {
     display: none !important;
   }
-  /* Image+circle row on mobile — side by side 50/50 */
+  /* Image+circle row on mobile: side by side 50/50 */
   #dashboard-grid > div:first-child {
     flex-direction: row !important;
   }
@@ -247,12 +247,12 @@
     flex: 1 1 50% !important;
     height: 150px !important;
   }
-  /* Bottom feed/goals cards — natural height */
+  /* Bottom feed/goals cards: natural height */
   #dashboard-grid > div:nth-child(3),
   #dashboard-grid > div:nth-child(4) {
     min-height: 260px;
   }
-  /* Stats card — compact row layout on mobile */
+  /* Stats card: compact row layout on mobile */
   .mobile-stats-card {
     flex-direction: row !important;
     align-items: stretch !important;

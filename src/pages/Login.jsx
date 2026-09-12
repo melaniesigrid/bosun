@@ -10,7 +10,7 @@ import * as auth from "@/api/auth";
  * production, because an endpoint that hands out a session for a known address
  * is an account takeover if it ever ships.
  *
- * The real flow is a magic link — issue #14.
+ * The real flow is a magic link: issue #14.
  */
 export default function Login() {
   const [email, setEmail] = useState("");

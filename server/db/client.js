@@ -8,7 +8,7 @@ const SCHEMA = resolve(ROOT, "db/001_initial.sql");
 /**
  * The database connection.
  *
- * Everything above this speaks one method — `query(text, params)` — which is
+ * Everything above this speaks one method (`query(text, params)`) which is
  * what lets the same query layer run against Postgres in production and against
  * PGlite in tests and local development. See server/db/queries.js.
  *

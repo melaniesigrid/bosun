@@ -15,7 +15,7 @@ import {
   withinWorkingHours,
 } from "../src/lib/followup-core.js";
 
-/** A fixed Tuesday, 10:00 local — inside default working hours. */
+/** A fixed Tuesday, 10:00 local, inside default working hours. */
 const NOW = new Date(2026, 8, 8, 10, 0, 0);
 
 const daysAgo = (n) => new Date(NOW.getTime() - n * 86400000);
@@ -235,7 +235,7 @@ describe("the message", () => {
   });
 
   it("uses the assignee's first name", () => {
-    assert.match(pingMessage(item("quiet")), /^Hey Ana —/);
+    assert.match(pingMessage(item("quiet")), /^Hey Ana:/);
   });
 
   it("falls back to something sayable when there is no name", () => {
@@ -265,7 +265,7 @@ describe("the message", () => {
     const q = item("quiet");
     assert.match(pingMessage(q, { tone: "direct" }), /^Ana: where is/);
     assert.match(pingMessage(q, { tone: "formal" }), /^Hello Ana, could you share/);
-    assert.match(pingMessage(q, { tone: "friendly" }), /^Hey Ana —/);
+    assert.match(pingMessage(q, { tone: "friendly" }), /^Hey Ana:/);
   });
 
   it("always invites the reply that unblocks the work, in that tone's words", () => {

@@ -2,7 +2,7 @@
  * The transport for every call the app makes.
  *
  * This replaced the hosted SDK client. The nine modules beside it kept their
- * shapes, so no component changed when the backend did — which was the entire
+ * shapes, so no component changed when the backend did: which was the entire
  * point of building the facade first.
  */
 

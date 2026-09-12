@@ -5,7 +5,7 @@ import { AlertCircle, Clock, HelpCircle, UserX } from "lucide-react";
 /**
  * What the lead should do about the portfolio this morning.
  *
- * Presentational only — every judgement comes from src/lib/followup-core.js, so
+ * Presentational only: every judgement comes from src/lib/followup-core.js, so
  * the rule that decides "quiet" is the same one the scheduler will use to decide
  * who to message. Nothing here re-derives it.
  */
@@ -63,7 +63,7 @@ function Row({ item, showState = true, showAssignee = true }) {
         <p style={{ margin: "2px 0 0", fontSize: 12.5, color: "#6e6e6e" }}>
           {/* Always say why. A flag with no reason is just a colour. The state
               and the assignee are dropped where the panel heading already says
-              them — repeating it reads as filler. */}
+              them: repeating it reads as filler. */}
           {showState && (
             <>
               <span style={{ color: tone.color, fontWeight: 500 }}>{tone.label}</span>
@@ -176,7 +176,7 @@ export default function TriageBoard({ buckets, summary }) {
         <Panel
           icon={HelpCircle}
           title="Needs you"
-          blurb="Someone said they are stuck. Bosun does not chase these — you unblock them."
+          blurb="Someone said they are stuck. Bosun does not chase these. You unblock them."
           items={summary.needsYou}
           empty="Nobody is waiting on you."
           showState={false}

@@ -55,7 +55,7 @@ export default function Goals() {
           </h1>
           <p style={{ fontSize: 14, color: '#6e6e6e' }}>Manage your team objectives</p>
         </div>
-        {/* New Goal button — top-right on mobile */}
+        {/* New Goal button: top-right on mobile */}
         <button
           onClick={() => setShowWizard(true)}
           className="flex items-center gap-2 btn-neu"
@@ -126,7 +126,7 @@ export default function Goals() {
       )}
 
       <>
-          {/* Filter chips — horizontal scroll on mobile */}
+          {/* Filter chips: horizontal scroll on mobile */}
           <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', marginBottom: 20, marginLeft: -2, marginRight: -2, paddingBottom: 4 }}>
             <div style={{ display: 'flex', gap: 8, padding: '2px 2px', width: 'max-content' }}>
               {FILTERS.map(f => {

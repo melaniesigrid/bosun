@@ -4,14 +4,14 @@
 > **Spending rule: if this project spends more than US$10 in a day, stop and ask
 > before doing anything else.**
 >
-> This binds every agent and every person, on every paid API — model calls,
+> This binds every agent and every person, on every paid API: model calls,
 > Places/Maps, email, storage, ads, build minutes. Say the running total, what it
 > bought, and what the next step would cost. Then wait for a yes. Do not resume on
 > your own judgment, and do not split work into smaller runs to stay under the line.
 >
 > - **The ceiling goes in before the loop does.** Anything that calls a paid API
 >   more than once needs a hard maximum and a way to stop, written before the
->   first run — not after the first bill.
+>   first run, not after the first bill.
 > - **A cap in the code is not a cap.** Set a budget alert and a quota ceiling in
 >   the provider's own console as well. An application-level limit cannot survive
 >   a bug in the application, and that is exactly when it is needed.
@@ -19,7 +19,7 @@
 >   API without going through this project's meter spends money nothing counts.
 >   If it costs money, it goes through the meter.
 > - **Stop on the first sign of a runaway.** A retry storm, a loop that will not
->   terminate, a job that hangs — kill it and report. Never leave a process that
+>   terminate, a job that hangs: kill it and report. Never leave a process that
 >   is spending money running while you investigate why.
 >
 > **Why this rule exists.** ZipQuarry spent roughly US$700 on Google Places
@@ -98,14 +98,14 @@ Vite + React 18, React Router, TanStack Query, Tailwind and shadcn/ui,
 
 ## The domain
 
-- **Goal** — an objective, its owner, a target date, and the clarifying questions
+- **Goal** (an objective, its owner, a target date, and the clarifying questions
   and answers that give the AI enough context to plan against it.
-- **Task** — generated or hand-written, belongs to a goal, has one assignee, a
+- **Task**) generated or hand-written, belongs to a goal, has one assignee, a
   deadline, an estimate, and a status (`pending`, `in_progress`, `blocked`,
   `done`, `need_help`).
-- **Ping** — an outbound nudge to an assignee, and their response.
-- **Update** — a status report in the assignee's own words, attached to a task.
-- **Agent** / **AgentActivity** — the configured AI worker and the audit log of
+- **Ping** (an outbound nudge to an assignee, and their response.
+- **Update**) a status report in the assignee's own words, attached to a task.
+- **Agent** / **AgentActivity**: the configured AI worker and the audit log of
   every action it took: goals analyzed, tasks generated and assigned, pings
   sent, workloads balanced.
 

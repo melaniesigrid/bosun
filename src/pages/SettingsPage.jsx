@@ -87,7 +87,7 @@ export default function SettingsPage() {
 
         {/* Left column: Workspace + Working Hours stacked flush */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          {/* Workspace — rounded top only */}
+          {/* Workspace: rounded top only */}
           <div className="neu-raised" style={{ padding: '22px 24px' }}>
             <p style={{ fontSize: 13, fontWeight: 600, color: '#3a3a3a', letterSpacing: '0.04em', marginBottom: 18 }}>Workspace</p>
             <FieldLabel>Workspace Name</FieldLabel>
@@ -98,7 +98,7 @@ export default function SettingsPage() {
             />
           </div>
 
-          {/* Working Hours — rounded bottom only */}
+          {/* Working Hours: rounded bottom only */}
           <div className="neu-raised" style={{ padding: '22px 24px' }}>
             <p style={{ fontSize: 13, fontWeight: 600, color: '#3a3a3a', letterSpacing: '0.04em', marginBottom: 18 }}>Working Hours</p>
             <FieldLabel hint="AI will only send pings during these hours">Active Window</FieldLabel>

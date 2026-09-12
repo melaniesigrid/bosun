@@ -116,7 +116,7 @@ CREATE TABLE tasks (
   --
   -- The reference is composite, on (tenant_id, goal_id) rather than goal_id
   -- alone. A plain REFERENCES goals(id) is satisfied by *any* goal, so a task
-  -- in one workspace could be pointed at another workspace's goal — and since
+  -- in one workspace could be pointed at another workspace's goal, and since
   -- tasks are read with the goal title joined on, that is a cross-tenant read.
   -- An HTTP test caught exactly that, with a 200.
   goal_id   uuid NOT NULL,

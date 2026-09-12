@@ -1,4 +1,4 @@
-# Migrating off Base44 — done, except the model calls
+# Migrating off Base44: done, except the model calls
 
 Base44 is not a framework in this codebase. It was the entire backend. Removing
 it meant writing one, not swapping an import.
@@ -6,7 +6,7 @@ it meant writing one, not swapping an import.
 **Status: the app runs with no Base44 anywhere.** Its own API serves it, its own
 session authenticates it, and `@base44/sdk`, `@base44/vite-plugin`, `base44/`
 and `src/lib/app-params.js` are gone from the tree. The one piece outstanding is
-the two model calls, which answer 501 — see step 5.
+the two model calls, which answer 501: see step 5.
 
 ## What Base44 currently provides
 
@@ -16,20 +16,20 @@ Every call the app makes, extracted from source:
 | --- | --- | --- |
 | `base44.auth` | `me`, `updateMe`, `isAuthenticated`, `logout`, `redirectToLogin` | Session cookie + magic link |
 | `base44.entities.*` | `list`, `filter`, `create`, `update`, `delete`, `deleteMany` on Goal, Task, Ping, Update, Agent, AgentActivity, User | Drizzle queries against Neon Postgres |
-| `base44.integrations.Core.InvokeLLM` | Clarifying questions, task generation, ping copy | Server-side Claude call — never from the browser |
+| `base44.integrations.Core.InvokeLLM` | Clarifying questions, task generation, ping copy | Server-side Claude call, never from the browser |
 | `base44.users.inviteUser` | Team page | Invite token + transactional email |
 | `base44.functions.invoke` | `getMyTasks` | A route handler |
 
-Row-level security is declared per entity in `base44/entities/*.jsonc` — most
+Row-level security is declared per entity in `base44/entities/*.jsonc`: most
 are admin-write, all-read. Those rules are **not** documentation; they are the
 only thing currently preventing a member from editing another team's goals.
 They have to be reimplemented as explicit tenant scoping, not assumed.
 
 ## Order of work
 
-**1. Build the facade first, against Base44. — DONE**
-`src/api/` holds nine modules — `goals`, `tasks`, `updates`, `pings`,
-`activity`, `agents`, `team`, `auth`, `planner` — that expose exactly the
+**1. Build the facade first, against Base44. (DONE**
+`src/api/` holds nine modules) `goals`, `tasks`, `updates`, `pings`,
+`activity`, `agents`, `team`, `auth`, `planner`. That expose exactly the
 operations the UI needs, each implemented by calling `base44Client`. All 69 call
 sites across 17 components now go through them, and `base44Client` is imported
 by `src/api/` and nowhere else. Verify with:
@@ -41,7 +41,7 @@ grep -rn "base44Client" src/ | grep -v "^src/api/"   # must return nothing
 Steps 2-6 replace the insides of those nine modules. None of them should need to
 open a component.
 
-**2. Schema. — WRITTEN, NOT YET DEPLOYED**
+**2. Schema.: WRITTEN, NOT YET DEPLOYED**
 `db/001_initial.sql` holds the eight tables, translated from
 `base44/entities/*.jsonc`. It runs green against real Postgres in
 `test/schema.test.js` (PGlite, the engine compiled to WASM), so `npm test`
@@ -53,7 +53,7 @@ What changed in the translation, and why:
   survive the migration, so isolation becomes a column every query filters on.
 - Real foreign keys, with the cascades chosen per relationship. Deleting a goal
   takes its tasks (which is what `goals.remove` does by hand today) but only
-  nulls the link from `agent_activity` — deleting a goal must not erase the
+  nulls the link from `agent_activity`: deleting a goal must not erase the
   record of what the agent did about it.
 - The denormalised copies are gone. `goal_title`, `assignee_name` and
   `assignee_email` on Task were a workaround for not being able to join, and
@@ -67,15 +67,15 @@ Still to do here: pick the ORM, and apply it to a real database branch.
 **3. Auth.**
 Magic link, session cookie, a `users` table with the `lead` / `member` role and
 the `onboarded` flag the onboarding route already reads. `AuthContext.jsx`
-already models `user_not_registered` and `auth_required` as distinct states —
+already models `user_not_registered` and `auth_required` as distinct states:
 preserve both.
 
-**4. Data layer. — QUERIES WRITTEN, NOT YET SERVED**
+**4. Data layer.: QUERIES WRITTEN, NOT YET SERVED**
 `server/db/queries.js` holds every read and write, tested in
 `test/queries.test.js` against the same PGlite instance the schema runs on.
 
 Every function takes `tenantId` as its second argument and every statement
-filters on it — isolation is something the signature forces a caller to supply
+filters on it: isolation is something the signature forces a caller to supply
 rather than something a policy file declares. The cross-tenant tests are the
 ones that matter: fetching, updating and deleting another workspace's rows by
 id all return null rather than succeeding.
@@ -91,7 +91,7 @@ pointing `src/api/` at it instead of at Base44.
 **5. LLM.**
 `InvokeLLM` moves server-side. Both prompts already live in `src/api/planner.js`
 rather than in the wizard, so this is a change to one file. Structured output with a schema and validation on
-the way back — the goal wizard and task generation both parse the response into
+the way back: the goal wizard and task generation both parse the response into
 records that get written to the database, so an unvalidated response becomes
 corrupt data, not a bad string. Per-tenant token caps.
 

@@ -4,7 +4,7 @@
  *   npm run seed
  *
  * Safe to re-run: it clears the workspace it owns and rebuilds it. It refuses
- * to touch a real database — if DATABASE_URL is set, it stops.
+ * to touch a real database: if DATABASE_URL is set, it stops.
  */
 
 import { closeDb, getDb, migrate } from "../server/db/client.js";

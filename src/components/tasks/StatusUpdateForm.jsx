@@ -27,7 +27,7 @@ export default function StatusUpdateForm({ task, user, onSubmit }) {
     if (!status) return;
     setLoading(true);
     try {
-      // Log the update (best-effort — RLS may restrict by role)
+      // Log the update (best-effort: RLS may restrict by role)
       try {
         await updateApi.create({
           task_id: task.id,
@@ -65,7 +65,7 @@ export default function StatusUpdateForm({ task, user, onSubmit }) {
         await activity.log({
           action_type: "status_checked",
           title: `${user?.full_name || "Team member"} updated "${task.title}"`,
-          description: `Status: ${status}${message ? ` — "${message}"` : ""}`,
+          description: `Status: ${status}${message ? `: "${message}"` : ""}`,
           related_task_id: task.id
         });
       } catch (_) {}

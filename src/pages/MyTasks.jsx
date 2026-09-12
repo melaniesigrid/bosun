@@ -137,7 +137,7 @@ export default function MyTasks() {
         </div>
       )}
 
-      {/* Filter chips — horizontal scroll on mobile */}
+      {/* Filter chips: horizontal scroll on mobile */}
       <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', marginBottom: 20, marginLeft: -2, marginRight: -2, paddingBottom: 4 }}>
         <div style={{ display: 'flex', gap: 8, padding: '2px 2px', width: 'max-content' }}>
           {FILTERS.map(({ key, label }) => (

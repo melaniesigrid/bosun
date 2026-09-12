@@ -4,7 +4,7 @@ import { get, post } from "./http";
 
 /**
  * Pings sent to the signed-in person and not yet answered. The assignee is the
- * session, so this takes no argument — a caller cannot ask for someone else's.
+ * session, so this takes no argument: a caller cannot ask for someone else's.
  */
 export const listOpenFor = () => get("/pings");
 

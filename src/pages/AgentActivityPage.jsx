@@ -27,7 +27,7 @@ export default function AgentActivityPage() {
           <h1 style={{ fontSize: 28, fontWeight: 400, color: '#3a3a3a', letterSpacing: '-0.01em', lineHeight: 1.2, marginBottom: 4 }}>
             Agent Activity
           </h1>
-          <p style={{ fontSize: 14, color: '#6e6e6e' }}>Full transparency — every action the agent takes</p>
+          <p style={{ fontSize: 14, color: '#6e6e6e' }}>Full transparency: every action the agent takes</p>
         </div>
         {/* Online badge */}
         <div

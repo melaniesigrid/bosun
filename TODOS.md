@@ -1,4 +1,4 @@
-# Bosun — the road to launch
+# Bosun: the road to launch
 
 Written 3 Sep 2026. Status lines are facts checked against the tree, not
 estimates. Anything not verified says so.
@@ -16,13 +16,13 @@ src/pages/SettingsPage  offers a "Ping Frequency" setting
                         ...nothing writes one. There is no scheduler.
 ```
 
-Three of the eight `agent_action` values are ever produced — `goal_analyzed`,
+Three of the eight `agent_action` values are ever produced: `goal_analyzed`,
 `tasks_generated`, `status_checked`. The other five (`ping_sent`,
 `digest_created`, `workload_balanced`, `task_assigned`, `clarification_asked`)
 exist in the schema and in the UI's vocabulary, and nothing emits them.
 
 So what exists today is a board, a briefing that knows exactly who has gone
-quiet, and an activity log. The *following up* — the half the name is about —
+quiet, and an activity log. The *following up*: the half the name is about:
 is still not built: nothing sends. The landing page leads with the board, which
 is the honest thing to lead with while that is true.
 
@@ -38,13 +38,13 @@ Everything below is ordered around that.
 | `src/api/` facade | Done. 69 call sites, CI guards the boundary. |
 | `db/001_initial.sql` | 8 tables, executed against real Postgres in CI. |
 | `server/db/queries.js` | Every read/write, tenant-scoped, 24 tests. |
-| HTTP layer | `server/http/` — every route, tenant from the session only. |
+| HTTP layer | `server/http/`: every route, tenant from the session only. |
 | Auth | Session cookie. Dev sign-in works; magic links are #14. |
 | The follow-up rule | Written and tested. `src/lib/followup-core.js`. |
 | The Briefing page | Live at `/briefing`. Shows the triage and the drafts. |
 | The board | Live at `/tasks`. Five columns, drag writes status and sort_order. |
 | Base44 | **Gone.** SDK, plugin, entity files and app-params all removed. |
-| The model calls | Answer 501. The last piece of the migration — #16. |
+| The model calls | Answer 501. The last piece of the migration: #16. |
 | Sending a nudge | **Still nothing sends.** No scheduler, no `Ping` rows. |
 | Runs locally | Yes. `npm run seed && npm run api && npm run dev`. |
 | Deployed app | Nowhere yet. It no longer needs Base44 to run. |
@@ -61,22 +61,22 @@ Everything below is ordered around that.
 These are yours. Everything in Phase 1+ waits on D1; the rest can be decided in
 parallel.
 
-The whole backlog is on GitHub now — five milestones, one per phase, and every
+The whole backlog is on GitHub now: five milestones, one per phase, and every
 item below has an issue. <https://github.com/melaniesigrid/bosun/issues>
 
-- [x] **D1 — Server shape. Settled: a Node API beside the Vite app.** Express
+- [x] **D1: Server shape. Settled: a Node API beside the Vite app.** Express
       over `server/db/queries.js`, Vite proxying `/api`. The alternative was
       moving to Next.js for consistency with Shipshape, Quotefront and ReconAI;
       it was not worth a week of rewriting react-router when the UI already
       worked. Reversible: nothing in `server/` knows it is Express except
       `server/http/app.js`.
-- [ ] **D2 — Name.** "Bosun" is unverified. Check USPTO + CIPO, and domain
+- [ ] **D2: Name.** "Bosun" is unverified. Check USPTO + CIPO, and domain
       availability, before it goes on anything harder to change than a repo.
       Budget: one hour. Do it before D3.
-- [ ] **D3 — Pricing posture.** ZipQuarry publishes a price and self-serves; Northbound
+- [ ] **D3: Pricing posture.** ZipQuarry publishes a price and self-serves; Northbound
       publishes none and books a call. Bosun is a seat-based team SaaS, which
       argues for published + self-serve. *Recommendation: publish a price.*
-- [ ] **D4 — Focus.** This is the honest one. Northbound has Quotefront,
+- [ ] **D4: Focus.** This is the honest one. Northbound has Quotefront,
       ZipQuarry, ReconAI, Windward and Shipshape, none of them launched, and
       Bosun makes six. The binding constraint on this company is not
       engineering throughput, it is that no product has a paying customer.
@@ -86,7 +86,7 @@ item below has an issue. <https://github.com/melaniesigrid/bosun/issues>
 
 ---
 
-## Phase 0 — Decide (this week, ~2h)
+## Phase 0: Decide (this week, ~2h)
 
 - [ ] Answer D1–D4.
 - [ ] If D4 says "not Bosun": stop after this phase. Change the landing page
@@ -96,10 +96,10 @@ item below has an issue. <https://github.com/melaniesigrid/bosun/issues>
 
 ---
 
-## Phase 1 — Make the promise real (the follow-up loop)
+## Phase 1 (Make the promise real (the follow-up loop)
 
 This is the product. Do it *before* the backend migration if you want to
-validate the idea fastest — it can be built against Base44 as it stands.
+validate the idea fastest) it can be built against Base44 as it stands.
 
 - [x] **The rule.** `server/agent/followup-core.js`. Quiet means no `Update`
       within the assignee's `ping_frequency` budget; overdue outranks quiet; a
@@ -107,14 +107,14 @@ validate the idea fastest — it can be built against Base44 as it stands.
       chased. 45 tests.
 - [ ] **The job that runs it** (#8). The rule is pure and takes `now`; nothing
       calls it on a schedule yet. Needs D1.
-- [x] **Show it in the app** (#7). `/briefing` — Needs you, Slipping, Nobody
+- [x] **Show it in the app** (#7). `/briefing`: Needs you, Slipping, Nobody
       owns this, each row saying why, plus the drafts Bosun would send. Uses the
       same rule the scheduler will, so they cannot drift apart.
 - [x] **Respect working hours and tone.** `withinWorkingHours` and
       `nextSendTime` hold a 03:00 nudge until the window opens, and treat a
       window crossing midnight as a night shift rather than one that never
       sends. Tone drives the copy.
-- [x] **Write the ping.** `pingMessage`, plus `batchByAssignee` — one message
+- [x] **Write the ping.** `pingMessage`, plus `batchByAssignee`: one message
       per person, not one per task. Running the rule over the real portfolio
       produced 13 separate nudges to one inbox, which is spam, not follow-up.
       Deterministic templates rather than a model call: a nudge is short and
@@ -131,7 +131,7 @@ validate the idea fastest — it can be built against Base44 as it stands.
       lead, what is slipping, and what nobody owns. `npm run demo` renders it.
 - [ ] **The digest, delivered** (#11). Emitting `digest_created` and sending it
       needs the scheduler.
-- [ ] `workload_balanced` — the landing page shows it. Either build it or cut it
+- [ ] `workload_balanced`: the landing page shows it. Either build it or cut it
       from the page.
 - [x] Tests for the quiet-detection rule and the ping copy. 102 tests total.
 
@@ -143,7 +143,7 @@ See it on the real portfolio without any backend: `npm run demo`.
 
 ---
 
-## Phase 2 — Own the backend (MIGRATION.md steps 3–6)
+## Phase 2: Own the backend (MIGRATION.md steps 3–6)
 
 - [x] **D1 settled.** Node API beside Vite.
 - [x] **The HTTP layer** (#13). `server/http/app.js` over the query layer. The
@@ -151,7 +151,7 @@ See it on the real portfolio without any backend: `npm run demo`.
       a body. Tested by asking for another workspace's rows by id.
 - [x] **Sessions** (#14, partly). Signed HttpOnly cookie, `lead`/`member` roles
       enforced on the team routes, `user_not_registered` and `auth_required`
-      kept distinct. **Magic links are still to do** — sign-in today is a
+      kept distinct. **Magic links are still to do**: sign-in today is a
       development-only endpoint that refuses to run in production.
 - [x] **Point `src/api/` at the new API** (#15). Nine files changed. No
       component did, which is the whole return on building the facade first.
@@ -172,7 +172,7 @@ with one hole: creating a goal calls the planner, which answers 501.
 
 ---
 
-## Phase 3 — Safe for strangers
+## Phase 3: Safe for strangers
 
 Nothing here is optional once someone who is not you has an account.
 
@@ -189,7 +189,7 @@ Nothing here is optional once someone who is not you has an account.
       of people's work, and sends some of it to a model provider. PIPEDA and
       GDPR both apply the moment a stranger signs up.
 - [ ] **Email law.** Pings to a team member who was invited by their own lead are
-      relationship messages, not marketing — but the *invite* email and any
+      relationship messages, not marketing, but the *invite* email and any
       launch outreach are covered by CASL and CAN-SPAM. Unsubscribe path,
       physical address, honest sender.
 - [ ] Backups and a restore you have actually run once.
@@ -198,26 +198,26 @@ Nothing here is optional once someone who is not you has an account.
 
 ---
 
-## Phase 4 — Go to market
+## Phase 4: Go to market
 
 - [x] **The position.** "The board that chases people." The competition (Asana,
       Linear, Motion, Height) all sell a place to put work; Bosun sells the
       board *plus* the thing none of them do. Leading with the board is also the
       honest order while nothing sends.
-      **Watch the Shipshape overlap** — that product is also described as
+      **Watch the Shipshape overlap**. That product is also described as
       "kanban boards plus readiness rubrics". The boundary is now scope:
       Shipshape looks across a portfolio, Bosun looks inside one team.
 - [ ] **Name the buyer.** Best guess: a lead of 3–15 people who does not have a
       project manager and is personally the bottleneck on chasing. Agencies,
       small studios, ops teams. Not enterprise, not solo.
 - [ ] **Price it (D3).** Seat-based, published, self-serve. Anchor against a
-      part-time coordinator, not against Asana — that framing is the whole
+      part-time coordinator, not against Asana. That framing is the whole
       pitch. Free trial with a hard token cap.
 - [ ] **Five design partners before the price is final.** They use it free and
       tell you what breaks. This is the only research that counts.
 - [ ] **Landing page v2.** The page is honest today but it is a brochure: there
       is no way for an interested visitor to do anything. It needs an email
-      capture, and GitHub Pages cannot take a form submission — this is
+      capture, and GitHub Pages cannot take a form submission. This is
       Phase 2's deploy, or a hosted form.
 - [ ] Buy the domain (D2). Move the page off `github.io`.
 - [ ] Screenshots and a 60-second demo of the *loop*, not the board. The demo is
@@ -227,7 +227,7 @@ Nothing here is optional once someone who is not you has an account.
 
 ---
 
-## Phase 5 — Launch
+## Phase 5: Launch
 
 - [ ] Design partners running for two weeks with no manual intervention.
 - [ ] Billing live and tested with a real card.
@@ -244,7 +244,7 @@ Do not launch until every line is true:
 - [ ] A nudge sends on a schedule, in the assignee's working hours, without
       anyone triggering it.
 - [ ] No Base44 dependency anywhere in the tree.
-- [ ] A second workspace cannot see the first one's data — verified by a test at
+- [ ] A second workspace cannot see the first one's data: verified by a test at
       the HTTP layer, not only at the query layer.
 - [ ] Terms and privacy published, and accurate about the model provider.
 - [ ] Someone who is not you completed signup with no help.
@@ -284,10 +284,10 @@ Do not launch until every line is true:
 Two things exist now that did not, and both work with no database and no
 credentials:
 
-- `npm run dev`, then `/preview.html` — component fixtures through the real
+- `npm run dev`, then `/preview.html`: component fixtures through the real
   rule. The app cannot run without a backend, so this is the only way to look at
   UI. It caught two real UX bugs the first time it was pointed at anything.
-- `npm run demo` — the whole rule over a seeded Northbound portfolio, rendered.
+- `npm run demo`: the whole rule over a seeded Northbound portfolio, rendered.
   Output stays in `demo/` and must never be copied into `site/`.
 
 ---
@@ -299,6 +299,6 @@ credentials:
 - Anything that changes a component and a query in the same commit is probably
   two commits.
 - New pure logic gets a test in `test/`. Every bug found in the last three
-  sessions was found by a test or by looking at the rendered output — none by
+  sessions was found by a test or by looking at the rendered output: none by
   reading the code.
 - Work goes through a PR. `main` stays green.

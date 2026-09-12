@@ -2,7 +2,7 @@
  * The board: columns, ordering, and what a drag actually changes.
  *
  * Pure, like planner-core and followup-core. A drag is easy to get wrong in
- * ways that are invisible until someone's task quietly jumps back — so the part
+ * ways that are invisible until someone's task quietly jumps back, so the part
  * that decides "which rows changed and what are their new values" is separated
  * from the part that renders, and tested on its own.
  */
@@ -46,7 +46,7 @@ export function toColumns(tasks = []) {
 /**
  * Apply a drag.
  *
- * Returns the next column state for an immediate re-render, plus `changed` —
+ * Returns the next column state for an immediate re-render, plus `changed`:
  * the minimum set of rows whose status or sort_order actually differs. Only
  * those are written back, so dragging one card in a column of twenty does not
  * issue twenty updates.
@@ -79,7 +79,7 @@ export function applyMove(columns, { from, to, fromIndex, toIndex }) {
     });
   }
 
-  // The dragged card always counts, even when it landed on the same numbers —
+  // The dragged card always counts, even when it landed on the same numbers:
   // a cross-column move with matching indices still changes its status.
   if (!changed.some((c) => c.id === landed.id)) {
     changed.push({

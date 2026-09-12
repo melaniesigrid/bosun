@@ -5,7 +5,7 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
  * Which layout to render.
  *
  * All three used to render at once, hidden from each other with Tailwind's
- * responsive classes — so every page mounted three times and every effect,
+ * responsive classes, so every page mounted three times and every effect,
  * timer and query inside it ran three times. Choosing in JS renders one.
  */
 const QUERIES = { desktop: "(min-width: 1024px)", tablet: "(min-width: 768px)" };

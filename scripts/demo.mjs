@@ -11,8 +11,8 @@
  * the digest and the ping copy. The only thing invented is the task list.
  *
  * The output is deliberately NOT written into site/. site/ is published to
- * GitHub Pages, and the workspace rule — the one shipshape-brand exists to
- * enforce — is that the real portfolio does not go on a public URL.
+ * GitHub Pages, and the workspace rule (the one shipshape-brand exists to
+ * enforce) is that the real portfolio does not go on a public URL.
  */
 
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -135,7 +135,7 @@ function render({ buckets, summary, pings, owedCount, tenantName }) {
   return `<!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bosun — ${esc(tenantName)}</title>
+<title>Bosun · ${esc(tenantName)}</title>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
 <style>
   :root{--canvas:#ebe7e2;--surface:#eeeae6;--ink:#2e2a26;--ink-2:#665f57;--line:#d9d3cc;
@@ -188,7 +188,7 @@ function render({ buckets, summary, pings, owedCount, tenantName }) {
   ${stat(c.done, "Done", "good")}
 </div>
 
-${section("Needs you", "Someone reported a problem. Bosun does not chase these — you unblock them.", summary.needsYou)}
+${section("Needs you", "Someone reported a problem. Bosun does not chase these. You unblock them.", summary.needsYou)}
 ${section("Slipping", "Overdue or silent past the cadence, worst first.", summary.slipping)}
 ${section("Nobody owns this", "Work with no assignee. It cannot go quiet, because it never started.", summary.unassigned)}
 
@@ -224,7 +224,7 @@ const allTasks = await tasks.list(db, tenant, 500);
 const allUpdates = await updates.listRecent(db, tenant, 500);
 const team = await users.listMembers(db, tenant);
 
-// Newest update per task — the clock the quiet rule reads.
+// Newest update per task: the clock the quiet rule reads.
 const updatesByTask = {};
 for (const u of allUpdates) {
   if (!updatesByTask[u.task_id]) updatesByTask[u.task_id] = u.created_at;

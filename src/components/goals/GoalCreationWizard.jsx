@@ -175,7 +175,7 @@ export default function GoalCreationWizard({ teamMembers, onComplete, onCancel }
 
       onComplete();
     } catch (err) {
-      setError("The tasks did not save. The goal is still a draft — try again.");
+      setError("The tasks did not save. The goal is still a draft: try again.");
       console.error("approveAndCreate failed", err);
     } finally {
       setLoading(false);

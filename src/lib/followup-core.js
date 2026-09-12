@@ -3,7 +3,7 @@
  * lead needs to see this morning.
  *
  * This is the half of Bosun that is not a task list, and it is written the way
- * planner-core is — no database, no clock of its own, no network. `now` is
+ * planner-core is, no database, no clock of its own, no network. `now` is
  * always passed in. That is what makes "has this been quiet for three days"
  * testable instead of something you find out in production.
  *
@@ -31,7 +31,7 @@ const asTime = (v) => (v instanceof Date ? v.getTime() : new Date(v).getTime());
 export const daysBetween = (from, to) => (asTime(to) - asTime(from)) / DAY;
 
 /**
- * A task the assignee has already reported a problem with is not silence — it
+ * A task the assignee has already reported a problem with is not silence. It
  * is an answer. Chasing someone who told you they are blocked is the fastest
  * way to get a tool switched off, so these escalate to the lead instead.
  */
@@ -147,7 +147,7 @@ export const pingList = (buckets) =>
 
 /**
  * The lead's morning summary. Counts plus the handful of items that actually
- * need a decision — a digest listing everything is a second inbox, not a
+ * need a decision: a digest listing everything is a second inbox, not a
  * summary.
  */
 export function digest(buckets, { limit = 5 } = {}) {
@@ -168,7 +168,7 @@ export function digest(buckets, { limit = 5 } = {}) {
     needsYou: buckets.needs_lead.slice(0, limit),
 
     // Slipping means a person is behind. Work with nobody on it is not slipping
-    // — nobody has it to slip — and listing it in both places reads as two
+    // (nobody has it to slip) and listing it in both places reads as two
     // problems when it is one.
     slipping: [...buckets.overdue, ...buckets.quiet]
       .filter((t) => t.task.assignee_id)
@@ -202,7 +202,7 @@ const whenClause = ({ state, daysToDeadline, daysQuiet }) => {
  * The message body. Deterministic templates, one per configured tone.
  *
  * This is intentionally not a model call. A nudge is short, formulaic, and goes
- * out on a schedule to real colleagues — generating it costs money per send and
+ * out on a schedule to real colleagues: generating it costs money per send and
  * buys nothing, and a model that has a bad day here is rude to a person rather
  * than wrong in a document. The tone setting already captures the only variation
  * anyone asked for.
@@ -219,7 +219,7 @@ export function pingMessage(item, { tone = "friendly" } = {}) {
   if (tone === "formal") {
     return `Hello ${name}, could you share an update on "${title}"? ${when}. If it is blocked, please say what is needed.`;
   }
-  return `Hey ${name} — how is "${title}" going? ${when}. A one-line update is plenty, and say so if something is in the way.`;
+  return `Hey ${name}: how is "${title}" going? ${when}. A one-line update is plenty, and say so if something is in the way.`;
 }
 
 // ------------------------------------------------------------------ batching
@@ -279,10 +279,10 @@ function batchMessage(assignee, items, { tone, maxListed }) {
     : "";
 
   if (tone === "direct") {
-    return `${name}: ${n} items with no recent update — ${what}.${pressure} Which are moving, and what is blocking the rest?`;
+    return `${name}: ${n} items with no recent update: ${what}.${pressure} Which are moving, and what is blocking the rest?`;
   }
   if (tone === "formal") {
     return `Hello ${name}, I have ${n} items awaiting an update: ${what}.${pressure} Could you indicate which are progressing and what is required for the others?`;
   }
-  return `Hey ${name} — ${n} things I have not heard about: ${what}.${pressure} A line on each is plenty, and say if any are stuck.`;
+  return `Hey ${name}: ${n} things I have not heard about: ${what}.${pressure} A line on each is plenty, and say if any are stuck.`;
 }

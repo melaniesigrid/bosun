@@ -157,7 +157,7 @@ export default function TaskFormModal({ task = null, goalId, goals = [], onClose
             </div>
           </div>
 
-          {/* Goal selector — only shown when goals array is provided (outside GoalDetail) */}
+          {/* Goal selector: only shown when goals array is provided (outside GoalDetail) */}
           {goals.length > 0 && (
             <div>
               <label style={labelStyle}>Goal</label>

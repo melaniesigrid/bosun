@@ -13,7 +13,7 @@
  *    hard-coded allow-lists below. Values are always parameters.
  *
  * Every function here is async, including the ones that fail validation before
- * touching the database — a function that looks async at the call site must
+ * touching the database: a function that looks async at the call site must
  * reject rather than throw, or `.catch()` on it misses the error.
  *
  * `db` is anything with `query(text, params) -> { rows }`. PGlite satisfies it
@@ -35,7 +35,7 @@ const first = async (db, text, params) => {
  * Build a tenant-scoped UPDATE from a patch object.
  *
  * `allowed` is a hard-coded list per table. A column outside it is not silently
- * ignored — it throws, because a caller sending an unknown field is a bug, and
+ * ignored. It throws, because a caller sending an unknown field is a bug, and
  * quietly dropping it is how a write appears to succeed while doing nothing.
  */
 function buildUpdate(table, allowed, tenantId, id, patch) {
@@ -165,7 +165,7 @@ export const tasks = {
       [tenantId, goalId],
     ),
 
-  /** The caller's own tasks — what the getMyTasks function returned. */
+  /** The caller's own tasks: what the getMyTasks function returned. */
   listForAssignee: (db, tenantId, assigneeId) =>
     rows(
       db,

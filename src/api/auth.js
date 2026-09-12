@@ -4,7 +4,7 @@ import { get, patch, post } from "./http";
  * Session and identity.
  *
  * The session is an HttpOnly cookie set by the API. Nothing here reads or
- * stores a token — that was the Base44 mechanism, and it is deliberately gone.
+ * stores a token. That was the Base44 mechanism, and it is deliberately gone.
  */
 
 export const me = () => get("/me");

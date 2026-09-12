@@ -12,8 +12,8 @@ import { batchByAssignee, digest, pingList, triage } from "@/lib/followup-core";
  * The morning briefing.
  *
  * What went quiet, what is late, what nobody owns, and what Bosun would say
- * about it. Every judgement comes from src/lib/followup-core.js — the same
- * module the scheduler will run — so this page and the nudges that eventually
+ * about it. Every judgement comes from src/lib/followup-core.js (the same
+ * module the scheduler will run) so this page and the nudges that eventually
  * go out can never disagree about what "quiet" means.
  *
  * Nothing here sends. Until the scheduler exists this is a preview of the

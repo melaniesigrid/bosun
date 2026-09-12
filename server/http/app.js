@@ -49,7 +49,7 @@ export function createApp(db) {
    * Development sign-in. Given an email that already belongs to a workspace,
    * it starts a session.
    *
-   * This is NOT the production flow — a real magic link mails a single-use
+   * This is NOT the production flow: a real magic link mails a single-use
    * token. It is gated on BOSUN_DEV_LOGIN and refuses to exist in production,
    * because an endpoint that grants a session for a known address is an
    * account takeover if it ever ships.
@@ -248,7 +248,7 @@ export function createApp(db) {
     res.status(501).json({
       error: "not_implemented",
       message:
-        "Planning still runs through Base44. Moving it here is issue #16 — it needs a model key and a per-tenant spend cap.",
+        "Planning still runs through Base44. Moving it here is issue #16. It needs a model key and a per-tenant spend cap.",
     }));
 
   // ---------------------------------------------------------------- misc

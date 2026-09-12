@@ -51,9 +51,9 @@ export const PORTFOLIO = [
     description: "The follow-up loop is half built. Four decisions block the rest.",
     target: daysAhead(5),
     tasks: [
-      { title: "D1 — pick the server shape: Node API or Next.js", owner: 0, due: daysAhead(2), quiet: 0.2 },
-      { title: "D2 — trademark and domain check on the name", owner: 0, due: daysAhead(2), quiet: 1 },
-      { title: "D4 — decide whether Bosun gets finished or parked", owner: 0, due: daysAhead(1), quiet: 0.2 },
+      { title: "D1 (pick the server shape: Node API or Next.js", owner: 0, due: daysAhead(2), quiet: 0.2 },
+      { title: "D2) trademark and domain check on the name", owner: 0, due: daysAhead(2), quiet: 1 },
+      { title: "D4: decide whether Bosun gets finished or parked", owner: 0, due: daysAhead(1), quiet: 0.2 },
       { title: "Deliver the first real nudge on a schedule", owner: 0, status: "need_help", quiet: 2 },
     ],
   },

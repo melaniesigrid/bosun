@@ -20,14 +20,14 @@ const actionIcons = {
 
 // Green = completion/success | Orange = urgent/blocked | Purple = management/routine
 const actionColors = {
-  goal_analyzed:       '#C9B3F5',  // purple — planning
-  tasks_generated:     '#2ECC8A',  // green — creation success
-  task_assigned:       '#C9B3F5',  // purple — management
-  ping_sent:           '#FF8077',  // orange-red — urgent/needs attention
-  digest_created:      '#C9B3F5',  // purple — routine
-  status_checked:      '#C9B3F5',  // purple — routine
-  workload_balanced:   '#C9B3F5',  // purple — management
-  clarification_asked: '#FF8077',  // orange-red — needs attention
+  goal_analyzed:       '#C9B3F5',  // purple (planning
+  tasks_generated:     '#2ECC8A',  // green) creation success
+  task_assigned:       '#C9B3F5',  // purple (management
+  ping_sent:           '#FF8077',  // orange-red) urgent/needs attention
+  digest_created:      '#C9B3F5',  // purple (routine
+  status_checked:      '#C9B3F5',  // purple) routine
+  workload_balanced:   '#C9B3F5',  // purple (management
+  clarification_asked: '#FF8077',  // orange-red) needs attention
 };
 
 const nextActions = [
@@ -59,7 +59,7 @@ export default function LiveActivityFeed({ activities, tasks, scrollable = false
         style={{ overflowX: 'hidden', overflowY: 'hidden' }}
         whileHover={{ y: -5, boxShadow: '-12px -12px 28px rgba(255,250,244,0.92), 12px 12px 32px rgba(160,143,126,0.44)', transition: { duration: 0.22, ease: 'easeOut' } }}
       >
-        {/* Header — same hierarchy as Goals */}
+        {/* Header: same hierarchy as Goals */}
         <div className="flex items-center justify-between" style={{ padding: '20px 18px 0 18px', flexShrink: 0, marginBottom: 14 }}>
           <div className="flex items-center gap-2">
             <span style={{ display: 'inline-block', width: 7, height: 7, borderRadius: '50%', background: '#2ECC8A', flexShrink: 0, animation: 'live-pulse 2s ease-in-out infinite' }} />
@@ -75,7 +75,7 @@ export default function LiveActivityFeed({ activities, tasks, scrollable = false
             Full log <ArrowRight style={{ width: 12, height: 12, strokeWidth: 1.5 }} />
           </Link>
         </div>
-        {/* Next planned action — inset section at top */}
+        {/* Next planned action: inset section at top */}
         <div
           style={{
             margin: '14px 14px 0 14px',

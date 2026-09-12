@@ -50,7 +50,7 @@ const AuthenticatedApp = () => {
 
   return (
     <Routes>
-      {/* Reachable while signed out — it is how you stop being signed out. */}
+      {/* Reachable while signed out. It is how you stop being signed out. */}
       <Route path="/login" element={<Login />} />
       <Route path="/onboarding" element={<Onboarding />} />
       <Route element={<AppLayout />}>

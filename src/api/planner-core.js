@@ -5,7 +5,7 @@ import { format } from "date-fns";
  * schemas, and the normalisation applied to whatever the model returns.
  *
  * Nothing here imports the client, touches env, or reaches the network, which
- * is what makes it unit testable — and it is the half that survives when the
+ * is what makes it unit testable, and it is the half that survives when the
  * model call moves server-side in MIGRATION.md step 5.
  */
 
